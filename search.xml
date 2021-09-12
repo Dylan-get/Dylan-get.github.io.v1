@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>KG-EXAM</title>
+    <url>/2021/09/01/KG-EXAM/</url>
+    <content><![CDATA[<html><head></head><body><p>1.下载jdk</p>
+</body></html>]]></content>
+  </entry>
+  <entry>
     <title>lab1 聚类算法——k-means聚类</title>
     <url>/2021/08/24/ML-lab1/</url>
     <content><![CDATA[<html><head></head><body><p>内容：使用K-means算法实现图像压缩，分别在自己的3张图片和指定数据集上进行实验</p>
@@ -35,6 +41,31 @@
       <tags>
         <tag>ML</tag>
         <tag>k-means</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>微服务</title>
+    <url>/2021/08/20/Micro-Service/</url>
+    <content><![CDATA[<html><head></head><body><p><a href="https://www.cnblogs.com/xiaopotian/p/9520103.html">参考博客1</a></p>
+<p><a href="https://www.jianshu.com/p/d32b053e86e1">参考博客2</a></p>
+<p>微服务架构风格就是将单一应用的开发分为多个小的服务，每个小的服务在自己的进程中运行并使用轻量级机制进行通信（通常是一个HTTP API源），这些服务围绕业务性能进行构建，并且通过完全自动化的部署机制独立的部署。这些只需要最低限度的集中管理的服务，可以使用不同的编程语言编写，以及使用不同的数据存储技术。</p>
+<p>一个Monolithic应用由一个单元构建。企业级应用通常由三部分构建：客户端界面（包括HTML页面和运行在客户机器上浏览器里的javascript脚本），数据库（许多表构成的、相互关联的关系型数据库管理系统）以及一个服务器端应用。服务器端应用处理HTTP请求，执行域逻辑（domian logic），从数据库中查询和更新数据，选择并填充将要发送到浏览器的视图。这个服务器端程度就是一个Monolithic - 单一的逻辑上可执行的应用。对这个系统的任何更改都会构建和部署一个服务器端应用的新版本。</p>
+<p>对应用一个小的更改，将会重新构建者部署整个项目。随着时间的推移，通常很难保持一个良好的模块化结构，这使得更改时只影响应用的一个小模块变得更加困难，扩展时需要扩展整个应用，而不只是进行部分部署。</p>
+<p>大多数应用开发工作都使用了一个项目模型：目的是为了交付一些软件，然后就被认为是完成了。软件完成后被移交给维护部门，构建软件的项目组解散。</p>
+<p>微服务的支持者们倾向于避免这种模式，他们更倾向于一个团队应该负责产品的整个生命周期。这是一个共同的灵感，是亚马逊“你构建，你运维”的概念，一个开发团队对软件的开发承担全部的责任。</p>
+<p>使用服务作为组件（而不是库）的主要原因是服务是可以独立部署的。如果你的应用由单个进程中的多个库组成，则对单个组件的任何更改都将导致不得不重新部署整个应用。但是，如果将应用分解为多个服务，你可以期望单个服务的更改只需要重新部署该单个服务即可。当然，这也不是绝对的，一些更改将改变服务接口，从而会产生一些协调。但是优秀的微服务架构的目的是通过服务契约中的解耦服务边界和进化机制将这些更改最小化 。</p>
+<p>使用服务作为组件的另一个结果是更显式的组件接口。 大多数语言都没有良好的机制来定义显式的发布接口。通常只有文档化和规则才能防止用户破坏组件的封装，从而避免组件之间的紧密耦合。通过使用显式的远程调用机制，服务可以更容易的避免这种这种情况。</p>
+<h4 id="单体式应用："><a href="#单体式应用：" class="headerlink" title="单体式应用："></a>单体式应用：</h4><p>通过模块化逻辑设计并编写，但是最终它还是会打包并部署为单体式应用。具体的格式依赖于应用语言和框架。例如，许多Java应用会被打包为WAR格式，部署在Tomcat或者Jetty上，而另外一些Java应用会被打包成自包含的JAR格式，同样，Rails和Node.js会被打包成层级目录。</p>
+<p>这种应用开发风格很常见，因为IDE和其它工具都擅长开发一个简单应用，这类应用也很易于调试，只需要简单运行此应用，用Selenium链接UI就可以完成端到端测试。单体式应用也易于部署，只需要把打包应用拷贝到服务器端，通过在负载均衡器后端运行多个拷贝就可以轻松实现应用扩展。在早期这类应用运行的很好。</p>
+<h4 id="单体式应用的不足"><a href="#单体式应用的不足" class="headerlink" title="单体式应用的不足"></a>单体式应用的不足</h4><p>不幸的是，这种简单方法却有很大的局限性。一个简单的应用会随着时间推移逐渐变大。在每次的<a href="http://techblog.youdao.com/?p=373">sprint</a>中，开发团队都会面对新“故事”，然后开发许多新代码。几年后，这个小而简单的应用会变成了一个巨大的怪物。这儿有一个例子，我最近和一个开发者讨论，他正在写一个工具，用来分析他们一个拥有数百万行代码的应用中JAR文件之间的依赖关系。我很确信这个代码正是很多开发者经过多年努力开发出来的一个怪物。–<a href="http://techblog.youdao.com/?p=373">sprint开发</a></p>
+<p>一旦你的应用变成一个又大又复杂的怪物，那开发团队肯定很痛苦。敏捷开发和部署举步维艰，其中最主要问题就是这个应用太复杂，以至于任何单个开发者都不可能搞懂它。因此，修正bug和正确的添加新功能变的非常困难，并且很耗时。另外，团队士气也会走下坡路。如果代码难于理解，就不可能被正确的修改。最终会走向巨大的、不可理解的泥潭。</p>
+<p>单体式应用也会降低开发速度。应用越大，启动时间会越长。比如，最近的一个调查表明，有时候应用的启动时间居然超过了12分钟。我还听说某些应用需要40分钟启动时间。如果开发者需要经常重启应用，那么大部分时间就要在等待中渡过，生产效率受到极大影响。</p>
+<h4 id="微处理架构——处理复杂事物"><a href="#微处理架构——处理复杂事物" class="headerlink" title="微处理架构——处理复杂事物"></a>微处理架构——处理复杂事物</h4><p>许多公司，比如Amazon、eBay和NetFlix，通过采用微处理结构模式解决了上述问题。其思路不是开发一个巨大的单体式的应用，而是将应用分解为小的、互相连接的微服务。</p>
+<p>一个微服务一般完成某个特定的功能，比如下单管理、客户管理等等。每一个微服务都是微型六角形应用，都有自己的业务逻辑和适配器。一些微服务还会发布API给其它微服务和应用客户端使用。其它微服务完成一个Web UI，运行时，每一个实例可能是一个云VM或者是Docker容器。</p>
+</body></html>]]></content>
+      <tags>
+        <tag>微服务</tag>
+        <tag>开放</tag>
       </tags>
   </entry>
   <entry>
@@ -146,37 +177,6 @@
 </li>
 </ol>
 </body></html>]]></content>
-  </entry>
-  <entry>
-    <title>KG-EXAM</title>
-    <url>/2021/09/01/KG-EXAM/</url>
-    <content><![CDATA[<html><head></head><body><p>1.下载jdk</p>
-</body></html>]]></content>
-  </entry>
-  <entry>
-    <title>微服务</title>
-    <url>/2021/08/20/Micro-Service/</url>
-    <content><![CDATA[<html><head></head><body><p><a href="https://www.cnblogs.com/xiaopotian/p/9520103.html">参考博客1</a></p>
-<p><a href="https://www.jianshu.com/p/d32b053e86e1">参考博客2</a></p>
-<p>微服务架构风格就是将单一应用的开发分为多个小的服务，每个小的服务在自己的进程中运行并使用轻量级机制进行通信（通常是一个HTTP API源），这些服务围绕业务性能进行构建，并且通过完全自动化的部署机制独立的部署。这些只需要最低限度的集中管理的服务，可以使用不同的编程语言编写，以及使用不同的数据存储技术。</p>
-<p>一个Monolithic应用由一个单元构建。企业级应用通常由三部分构建：客户端界面（包括HTML页面和运行在客户机器上浏览器里的javascript脚本），数据库（许多表构成的、相互关联的关系型数据库管理系统）以及一个服务器端应用。服务器端应用处理HTTP请求，执行域逻辑（domian logic），从数据库中查询和更新数据，选择并填充将要发送到浏览器的视图。这个服务器端程度就是一个Monolithic - 单一的逻辑上可执行的应用。对这个系统的任何更改都会构建和部署一个服务器端应用的新版本。</p>
-<p>对应用一个小的更改，将会重新构建者部署整个项目。随着时间的推移，通常很难保持一个良好的模块化结构，这使得更改时只影响应用的一个小模块变得更加困难，扩展时需要扩展整个应用，而不只是进行部分部署。</p>
-<p>大多数应用开发工作都使用了一个项目模型：目的是为了交付一些软件，然后就被认为是完成了。软件完成后被移交给维护部门，构建软件的项目组解散。</p>
-<p>微服务的支持者们倾向于避免这种模式，他们更倾向于一个团队应该负责产品的整个生命周期。这是一个共同的灵感，是亚马逊“你构建，你运维”的概念，一个开发团队对软件的开发承担全部的责任。</p>
-<p>使用服务作为组件（而不是库）的主要原因是服务是可以独立部署的。如果你的应用由单个进程中的多个库组成，则对单个组件的任何更改都将导致不得不重新部署整个应用。但是，如果将应用分解为多个服务，你可以期望单个服务的更改只需要重新部署该单个服务即可。当然，这也不是绝对的，一些更改将改变服务接口，从而会产生一些协调。但是优秀的微服务架构的目的是通过服务契约中的解耦服务边界和进化机制将这些更改最小化 。</p>
-<p>使用服务作为组件的另一个结果是更显式的组件接口。 大多数语言都没有良好的机制来定义显式的发布接口。通常只有文档化和规则才能防止用户破坏组件的封装，从而避免组件之间的紧密耦合。通过使用显式的远程调用机制，服务可以更容易的避免这种这种情况。</p>
-<h4 id="单体式应用："><a href="#单体式应用：" class="headerlink" title="单体式应用："></a>单体式应用：</h4><p>通过模块化逻辑设计并编写，但是最终它还是会打包并部署为单体式应用。具体的格式依赖于应用语言和框架。例如，许多Java应用会被打包为WAR格式，部署在Tomcat或者Jetty上，而另外一些Java应用会被打包成自包含的JAR格式，同样，Rails和Node.js会被打包成层级目录。</p>
-<p>这种应用开发风格很常见，因为IDE和其它工具都擅长开发一个简单应用，这类应用也很易于调试，只需要简单运行此应用，用Selenium链接UI就可以完成端到端测试。单体式应用也易于部署，只需要把打包应用拷贝到服务器端，通过在负载均衡器后端运行多个拷贝就可以轻松实现应用扩展。在早期这类应用运行的很好。</p>
-<h4 id="单体式应用的不足"><a href="#单体式应用的不足" class="headerlink" title="单体式应用的不足"></a>单体式应用的不足</h4><p>不幸的是，这种简单方法却有很大的局限性。一个简单的应用会随着时间推移逐渐变大。在每次的<a href="http://techblog.youdao.com/?p=373">sprint</a>中，开发团队都会面对新“故事”，然后开发许多新代码。几年后，这个小而简单的应用会变成了一个巨大的怪物。这儿有一个例子，我最近和一个开发者讨论，他正在写一个工具，用来分析他们一个拥有数百万行代码的应用中JAR文件之间的依赖关系。我很确信这个代码正是很多开发者经过多年努力开发出来的一个怪物。–<a href="http://techblog.youdao.com/?p=373">sprint开发</a></p>
-<p>一旦你的应用变成一个又大又复杂的怪物，那开发团队肯定很痛苦。敏捷开发和部署举步维艰，其中最主要问题就是这个应用太复杂，以至于任何单个开发者都不可能搞懂它。因此，修正bug和正确的添加新功能变的非常困难，并且很耗时。另外，团队士气也会走下坡路。如果代码难于理解，就不可能被正确的修改。最终会走向巨大的、不可理解的泥潭。</p>
-<p>单体式应用也会降低开发速度。应用越大，启动时间会越长。比如，最近的一个调查表明，有时候应用的启动时间居然超过了12分钟。我还听说某些应用需要40分钟启动时间。如果开发者需要经常重启应用，那么大部分时间就要在等待中渡过，生产效率受到极大影响。</p>
-<h4 id="微处理架构——处理复杂事物"><a href="#微处理架构——处理复杂事物" class="headerlink" title="微处理架构——处理复杂事物"></a>微处理架构——处理复杂事物</h4><p>许多公司，比如Amazon、eBay和NetFlix，通过采用微处理结构模式解决了上述问题。其思路不是开发一个巨大的单体式的应用，而是将应用分解为小的、互相连接的微服务。</p>
-<p>一个微服务一般完成某个特定的功能，比如下单管理、客户管理等等。每一个微服务都是微型六角形应用，都有自己的业务逻辑和适配器。一些微服务还会发布API给其它微服务和应用客户端使用。其它微服务完成一个Web UI，运行时，每一个实例可能是一个云VM或者是Docker容器。</p>
-</body></html>]]></content>
-      <tags>
-        <tag>微服务</tag>
-        <tag>开放</tag>
-      </tags>
   </entry>
   <entry>
     <title>PCA</title>
@@ -340,49 +340,6 @@
 </body></html>]]></content>
   </entry>
   <entry>
-    <title>git</title>
-    <url>/2021/09/04/git/</url>
-    <content><![CDATA[<html><head></head><body><ol>
-<li><p>git init</p>
-</li>
-<li><p>git add </p>
-</li>
-<li><p>git commit </p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git commit -m "first commit"</span><br></pre></td></tr></tbody></table></figure></li>
-<li><p>git branch</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git branch -M main</span><br></pre></td></tr></tbody></table></figure>
-
-<ul>
-<li>git branch 查看本地所有分支</li>
-<li>git branch -r查看远程所有分支</li>
-<li>git branch -a查看本地和远程所有分支</li>
-</ul>
-</li>
-<li><p>git remote add </p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git remote add origin git@gitee.com:wuhaitao_coding/ttest.git</span><br></pre></td></tr></tbody></table></figure></li>
-<li><p>git push</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git push origin master</span><br><span class="line">git push -u origin master #加了参数-u后，以后即可直接用git push 代替git push origin master</span><br></pre></td></tr></tbody></table></figure></li>
-<li><p>git alias</p>
-</li>
-<li></li>
-</ol>
-<p>大家一定要养成在项目开始就创建.gitignore文件的习惯，否则一旦push，处理起来会非常麻烦</p>
-<p>有时候在项目开发过程中，突然心血来潮想把某些目录或文件加入忽略规则，按照上述方法定义后发现并未生效，原因是.gitignore只能忽略那些原来没有被track的文件，如果某些文件已经被纳入了版本管理中，则修改.gitignore是无效的。那么解决方法就是先把本地缓存删除（改变成未track状态），然后再提交：</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git rm -r --cached .</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line">git commit -m 'update .gitignore'</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#git fatal: 远程 origin 已经存在 </span><br><span class="line">#重新添加远程</span><br><span class="line">git remote -v  </span><br><span class="line">git remote rm origin</span><br><span class="line"></span><br><span class="line">git remote add origin git@gitee.com:wuhaitao_coding/knowledge-graph.git</span><br><span class="line">username填写gitee户名，我这里是：fortunamajor</span><br><span class="line">um.git 填写仓库名.git</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-
-
-<p>git remote rm origin</p>
-</body></html>]]></content>
-      <tags>
-        <tag>-git</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Hexo comment</title>
     <url>/2021/08/18/hexo-comment/</url>
     <content><![CDATA[<html><head></head><body><ol>
@@ -425,6 +382,49 @@
 </body></html>]]></content>
       <tags>
         <tag>Hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>git</title>
+    <url>/2021/09/04/git/</url>
+    <content><![CDATA[<html><head></head><body><ol>
+<li><p>git init</p>
+</li>
+<li><p>git add </p>
+</li>
+<li><p>git commit </p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git commit -m "first commit"</span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>git branch</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git branch -M main</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>git branch 查看本地所有分支</li>
+<li>git branch -r查看远程所有分支</li>
+<li>git branch -a查看本地和远程所有分支</li>
+</ul>
+</li>
+<li><p>git remote add </p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git remote add origin git@gitee.com:wuhaitao_coding/ttest.git</span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>git push</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git push origin master</span><br><span class="line">git push -u origin master #加了参数-u后，以后即可直接用git push 代替git push origin master</span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>git alias</p>
+</li>
+<li></li>
+</ol>
+<p>大家一定要养成在项目开始就创建.gitignore文件的习惯，否则一旦push，处理起来会非常麻烦</p>
+<p>有时候在项目开发过程中，突然心血来潮想把某些目录或文件加入忽略规则，按照上述方法定义后发现并未生效，原因是.gitignore只能忽略那些原来没有被track的文件，如果某些文件已经被纳入了版本管理中，则修改.gitignore是无效的。那么解决方法就是先把本地缓存删除（改变成未track状态），然后再提交：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git rm -r --cached .</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line">git commit -m 'update .gitignore'</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#git fatal: 远程 origin 已经存在 </span><br><span class="line">#重新添加远程</span><br><span class="line">git remote -v  </span><br><span class="line">git remote rm origin</span><br><span class="line"></span><br><span class="line">git remote add origin git@gitee.com:wuhaitao_coding/knowledge-graph.git</span><br><span class="line">username填写gitee户名，我这里是：fortunamajor</span><br><span class="line">um.git 填写仓库名.git</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+
+
+<p>git remote rm origin</p>
+</body></html>]]></content>
+      <tags>
+        <tag>-git</tag>
       </tags>
   </entry>
   <entry>
@@ -487,40 +487,6 @@
       <tags>
         <tag>Hexo</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>medical segmentation</title>
-    <url>/2021/08/20/medical-segmentation/</url>
-    <content><![CDATA[<html><head></head><body><ol>
-<li><h3 id="nii-gz-和-nii文件"><a href="#nii-gz-和-nii文件" class="headerlink" title=".nii.gz 和.nii文件"></a>.nii.gz 和.nii文件</h3><p>区域：喉癌和下咽癌癌灶，都是发生在咽喉部位的恶性肿瘤疾病。</p>
-<p>患有下咽癌，多数患者都会出现明显的临床症状表现，主要有咽喉部异物感、吞咽疼痛以及颈部肿块、声嘶、咯血、呼吸困难等。而喉癌的症状主要有声音嘶哑、吞咽困难、呼吸困难、痰中带血等</p>
-<p>下咽癌诊断方法多，常用的主要有六种，分别是颈部检查、喉咽部检查、细胞学检查、MRI检查(核磁共振成像)、喉X线体层拍片检查、常规X线检查等。而喉癌的诊断方法主要有喉镜检查、病理组织活检、CT检查、超声检查等。</p>
-<p>图像：增强 CT 成像</p>
-<p>标准NIfTI图像的扩展名是.nii，包含了头文件及图像资料。由于NIfTI格式和Analyze格式的关系，因此NIfTI格式也可使用独立的图像文件[.img]和头文件[.hdr]。</p>
-<p>nii格式和.nii.gz格式是一个东西，freesurfer中可以直接调用除了dicom和.nii.gz也可以直接调用.nii</p>
-<p>python可使用sitk查看</p>
-<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> SimpleITK <span class="keyword">as</span> sitk</span><br><span class="line">itk_img = sitk.ReadImage(os.path.join(imageDir,ele))   <span class="comment">#（X，Y，Z）</span></span><br><span class="line">img = sitk.GetArrayFromImage(itk_img)</span><br><span class="line"></span><br><span class="line">name=<span class="string">'001'</span></span><br><span class="line">out = sitk.GetImageFromArray(img)</span><br><span class="line">sitk.WriteImage(out,os.path.join(outdir,name+<span class="string">'.nii.gz'</span>))</span><br></pre></td></tr></tbody></table></figure></li>
-<li><p>评价指标</p>
-</li>
-<li><p>Sota 模型</p>
-<p><a href="https://github.com/JunMa11/SOTA-MedSeg">截止到2021.1的sota模型</a></p>
-<p><a href="https://github.com/MIC-DKFZ/nnUNet">nnUet</a></p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">conda install pytorch==1.8.0 torchvision==0.9.0 torchaudio==0.8.0 cudatoolkit=10.2 -c pytorch</span><br><span class="line">pip install nnunet</span><br><span class="line"></span><br><span class="line">pip install --upgrade git+https://github.com/FabianIsensee/hiddenlayer.git@more_plotted_details#egg=hiddenlayer</span><br><span class="line"></span><br><span class="line">vim ~/.bashrc</span><br><span class="line">export nnUNet_raw_data_base="/home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw"                   </span><br><span class="line">export nnUNet_preprocessed="/home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_preprocessed"</span><br><span class="line">export RESULTS_FOLDER="/home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_trained_models"</span><br><span class="line">source ~/.bashrc</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line">nnUNet_convert_decathlon_task -i /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw/nnUNet_raw_data/Task05_Tumour</span><br><span class="line"></span><br><span class="line">nnUNet_plan_and_preprocess -t 5 --verify_dataset_integrity</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=1 nnUNet_train 2d nnUNetTrainerV2 5 0  --npz</span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=2 nnUNet_train 2d nnUNetTrainerV2 5 1</span><br><span class="line"></span><br><span class="line">nohup sh s2df1.sh &gt;fold1 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=3 nnUNet_train 2d nnUNetTrainerV2 5 2</span><br><span class="line"></span><br><span class="line">nohup sh s2df2.sh &gt;2d-fold2 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_train 3d_fullres nnUNetTrainerV2 5 3 -c --npz</span><br><span class="line"></span><br><span class="line">nohup sh s2df3.sh &gt;2d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=5 nnUNet_train 2d nnUNetTrainerV2 5 4</span><br><span class="line"></span><br><span class="line">nohup sh s2df4.sh &gt;2d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">s2df4</span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c --npz</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nohup sh s2df1.sh &gt;2d-fold1 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df2.sh &gt;2d-fold2 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df3.sh &gt;2d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df4.sh &gt;2d-fold4 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df5.sh &gt;2d-fold5 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nnUNet_find_best_configuration -m 2d -t 5 --strict</span><br><span class="line"></span><br><span class="line">nnUNet_predict -i /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw/nnUNet_raw_data/Task005_Tumour/imagesTs -o /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/res/2d -tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 2d -p nnUNetPlansv2.1 -t Task005_Tumour</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_predict -i /home/haitaowu/2021summer/final/nnUNetFrame/Res/ct_gz -o /home/haitaowu/2021summer/final/nnUNetFrame/Res/ctPredict -tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 2d -p nnUNetPlansv2.1 -t Task005_Tumour</span><br><span class="line"></span><br><span class="line">nohup sh s3dLowf1.sh &gt;fold1 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nohup sh s3df1.sh &gt;3d-fold1 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df2.sh &gt;3d-fold2 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df3.sh &gt;3d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df4.sh &gt;3d-fold4 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df5.sh &gt;3d-fold5 2&gt;&amp;1 &amp;</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_train 3d_fullres nnUNetTrainerV2 5 2 -c --npz</span><br></pre></td></tr></tbody></table></figure>
-
-<p>008.nii.gz 不行</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">##2D</span><br><span class="line">RuntimeError: MultiThreadedAugmenter.abort_event was set, something went wrong. Maybe one of your workers crashed. This is not the actual error message! Look further up your stdout to see what caused the error. Please also check whether your RAM was full</span><br><span class="line">需要加上参数--ipc=host</span><br><span class="line">pytorch 1.6.0 py3.8_cuda10.1.243_cudnn7.6.3_0 pytorch</span><br><span class="line">conda install pytorch==1.8.0 torchvision==0.9.0 torchaudio==0.8.0 cudatoolkit=10.2 -c pytorch</span><br><span class="line"></span><br><span class="line">##3D full resolution U-Net</span><br><span class="line">nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line">nnUNet_train 2d nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nohup nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c &amp;</span><br><span class="line">返回shell</span><br><span class="line">输入exit退出终端</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=0 nnUNet_train 3d_lowres nnUNetTrainerV2 5 4 --npz</span><br><span class="line"></span><br><span class="line">nnUNet_train 3d_lowres nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line">nnUNet_find_best_configuration -m 3d_fullres  -t 5 --strict</span><br><span class="line"></span><br><span class="line">nnUNet_find_best_configuration -m 2d 3d_fullres 3d_lowres 3d_cascade_fullres -t XXX --strict</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=6 nnUNet_predict -i /home/haitaowu/2021summer/final/nnUNetFrame/Res/ct -o /home/haitaowu/2021summer/final/nnUNetFrame/Res/tmp2 -tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 2d -p nnUNetPlansv2.1 -t Task005_Tumour --save_npz</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=0 nnUNet_predict \</span><br><span class="line">-i /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw/nnUNet_raw_data/Task005_Tumour/imagesTs \</span><br><span class="line">-o /home/haitaowu/2021summer/final/nnUNetFrame/Res/tmp \</span><br><span class="line">-tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 3d_fullres -p nnUNetPlansv2.1 -t Task005_Tumour --save_npz</span><br><span class="line"></span><br><span class="line">nnUNet_ensemble -f OUTPUT_DIRECTORY_3D OUTPUT_DIRECTORY_2D -o OUTPUT_FOLDER_ENSEMBLE -pp POSTPROCESSING_FILE</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure></li>
-<li><p>比赛运行命令</p>
-<p>1.</p>
-<p>2.</p>
-</li>
-<li><p>?</p>
-</li>
-</ol>
-</body></html>]]></content>
   </entry>
   <entry>
     <title>minecraft-server-client</title>
@@ -610,14 +576,6 @@
       </tags>
   </entry>
   <entry>
-    <title>python 自动生成代码工具</title>
-    <url>/2021/08/20/python-auto-coding/</url>
-    <content><![CDATA[<html><head></head><body></body></html>]]></content>
-      <tags>
-        <tag>python</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>python自动化生成报告</title>
     <url>/2021/08/20/python-auto-docx/</url>
     <content><![CDATA[<html><head></head><body><ol>
@@ -638,6 +596,14 @@
       </tags>
   </entry>
   <entry>
+    <title>python 自动生成代码工具</title>
+    <url>/2021/08/20/python-auto-coding/</url>
+    <content><![CDATA[<html><head></head><body></body></html>]]></content>
+      <tags>
+        <tag>python</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>python compiler——基于python的python编译器</title>
     <url>/2021/08/20/python-compiler/</url>
     <content><![CDATA[<html><head></head><body></body></html>]]></content>
@@ -652,6 +618,19 @@
         <tag>python</tag>
         <tag>log</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>screen</title>
+    <url>/2021/08/26/screen/</url>
+    <content><![CDATA[<html><head></head><body><h1 id="Linux将screen屏幕标准输出输出到日志中"><a href="#Linux将screen屏幕标准输出输出到日志中" class="headerlink" title="Linux将screen屏幕标准输出输出到日志中"></a>Linux将screen屏幕标准输出输出到日志中</h1><p>创建终端</p>
+<figure class="highlight shell"><table><tbody><tr><td class="code"><pre><span class="line">screen -S NAME</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<p>连接终端</p>
+<figure class="highlight shell"><table><tbody><tr><td class="code"><pre><span class="line">screen -R NAME</span><br></pre></td></tr></tbody></table></figure>
+
+</body></html>]]></content>
   </entry>
   <entry>
     <title>python 包管理与目录管理</title>
@@ -678,16 +657,37 @@
       </tags>
   </entry>
   <entry>
-    <title>screen</title>
-    <url>/2021/08/26/screen/</url>
-    <content><![CDATA[<html><head></head><body><h1 id="Linux将screen屏幕标准输出输出到日志中"><a href="#Linux将screen屏幕标准输出输出到日志中" class="headerlink" title="Linux将screen屏幕标准输出输出到日志中"></a>Linux将screen屏幕标准输出输出到日志中</h1><p>创建终端</p>
-<figure class="highlight shell"><table><tbody><tr><td class="code"><pre><span class="line">screen -S NAME</span><br></pre></td></tr></tbody></table></figure>
+    <title>medical segmentation</title>
+    <url>/2021/08/20/medical-segmentation/</url>
+    <content><![CDATA[<html><head></head><body><ol>
+<li><h3 id="nii-gz-和-nii文件"><a href="#nii-gz-和-nii文件" class="headerlink" title=".nii.gz 和.nii文件"></a>.nii.gz 和.nii文件</h3><p>区域：喉癌和下咽癌癌灶，都是发生在咽喉部位的恶性肿瘤疾病。</p>
+<p>患有下咽癌，多数患者都会出现明显的临床症状表现，主要有咽喉部异物感、吞咽疼痛以及颈部肿块、声嘶、咯血、呼吸困难等。而喉癌的症状主要有声音嘶哑、吞咽困难、呼吸困难、痰中带血等</p>
+<p>下咽癌诊断方法多，常用的主要有六种，分别是颈部检查、喉咽部检查、细胞学检查、MRI检查(核磁共振成像)、喉X线体层拍片检查、常规X线检查等。而喉癌的诊断方法主要有喉镜检查、病理组织活检、CT检查、超声检查等。</p>
+<p>图像：增强 CT 成像</p>
+<p>标准NIfTI图像的扩展名是.nii，包含了头文件及图像资料。由于NIfTI格式和Analyze格式的关系，因此NIfTI格式也可使用独立的图像文件[.img]和头文件[.hdr]。</p>
+<p>nii格式和.nii.gz格式是一个东西，freesurfer中可以直接调用除了dicom和.nii.gz也可以直接调用.nii</p>
+<p>python可使用sitk查看</p>
+<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> SimpleITK <span class="keyword">as</span> sitk</span><br><span class="line">itk_img = sitk.ReadImage(os.path.join(imageDir,ele))   <span class="comment">#（X，Y，Z）</span></span><br><span class="line">img = sitk.GetArrayFromImage(itk_img)</span><br><span class="line"></span><br><span class="line">name=<span class="string">'001'</span></span><br><span class="line">out = sitk.GetImageFromArray(img)</span><br><span class="line">sitk.WriteImage(out,os.path.join(outdir,name+<span class="string">'.nii.gz'</span>))</span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>评价指标</p>
+</li>
+<li><p>Sota 模型</p>
+<p><a href="https://github.com/JunMa11/SOTA-MedSeg">截止到2021.1的sota模型</a></p>
+<p><a href="https://github.com/MIC-DKFZ/nnUNet">nnUet</a></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">conda install pytorch==1.8.0 torchvision==0.9.0 torchaudio==0.8.0 cudatoolkit=10.2 -c pytorch</span><br><span class="line">pip install nnunet</span><br><span class="line"></span><br><span class="line">pip install --upgrade git+https://github.com/FabianIsensee/hiddenlayer.git@more_plotted_details#egg=hiddenlayer</span><br><span class="line"></span><br><span class="line">vim ~/.bashrc</span><br><span class="line">export nnUNet_raw_data_base="/home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw"                   </span><br><span class="line">export nnUNet_preprocessed="/home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_preprocessed"</span><br><span class="line">export RESULTS_FOLDER="/home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_trained_models"</span><br><span class="line">source ~/.bashrc</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line">nnUNet_convert_decathlon_task -i /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw/nnUNet_raw_data/Task05_Tumour</span><br><span class="line"></span><br><span class="line">nnUNet_plan_and_preprocess -t 5 --verify_dataset_integrity</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=1 nnUNet_train 2d nnUNetTrainerV2 5 0  --npz</span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=2 nnUNet_train 2d nnUNetTrainerV2 5 1</span><br><span class="line"></span><br><span class="line">nohup sh s2df1.sh &gt;fold1 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=3 nnUNet_train 2d nnUNetTrainerV2 5 2</span><br><span class="line"></span><br><span class="line">nohup sh s2df2.sh &gt;2d-fold2 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_train 3d_fullres nnUNetTrainerV2 5 3 -c --npz</span><br><span class="line"></span><br><span class="line">nohup sh s2df3.sh &gt;2d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=5 nnUNet_train 2d nnUNetTrainerV2 5 4</span><br><span class="line"></span><br><span class="line">nohup sh s2df4.sh &gt;2d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">s2df4</span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c --npz</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nohup sh s2df1.sh &gt;2d-fold1 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df2.sh &gt;2d-fold2 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df3.sh &gt;2d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df4.sh &gt;2d-fold4 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df5.sh &gt;2d-fold5 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nnUNet_find_best_configuration -m 2d -t 5 --strict</span><br><span class="line"></span><br><span class="line">nnUNet_predict -i /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw/nnUNet_raw_data/Task005_Tumour/imagesTs -o /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/res/2d -tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 2d -p nnUNetPlansv2.1 -t Task005_Tumour</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_predict -i /home/haitaowu/2021summer/final/nnUNetFrame/Res/ct_gz -o /home/haitaowu/2021summer/final/nnUNetFrame/Res/ctPredict -tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 2d -p nnUNetPlansv2.1 -t Task005_Tumour</span><br><span class="line"></span><br><span class="line">nohup sh s3dLowf1.sh &gt;fold1 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nohup sh s3df1.sh &gt;3d-fold1 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df2.sh &gt;3d-fold2 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df3.sh &gt;3d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df4.sh &gt;3d-fold4 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df5.sh &gt;3d-fold5 2&gt;&amp;1 &amp;</span><br></pre></td></tr></tbody></table></figure>
 
 
 
-<p>连接终端</p>
-<figure class="highlight shell"><table><tbody><tr><td class="code"><pre><span class="line">screen -R NAME</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_train 3d_fullres nnUNetTrainerV2 5 2 -c --npz</span><br></pre></td></tr></tbody></table></figure>
 
+<p>008.nii.gz 不行</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">##2D</span><br><span class="line">RuntimeError: MultiThreadedAugmenter.abort_event was set, something went wrong. Maybe one of your workers crashed. This is not the actual error message! Look further up your stdout to see what caused the error. Please also check whether your RAM was full</span><br><span class="line">需要加上参数--ipc=host</span><br><span class="line">pytorch 1.6.0 py3.8_cuda10.1.243_cudnn7.6.3_0 pytorch</span><br><span class="line">conda install pytorch==1.8.0 torchvision==0.9.0 torchaudio==0.8.0 cudatoolkit=10.2 -c pytorch</span><br><span class="line"></span><br><span class="line">##3D full resolution U-Net</span><br><span class="line">nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line">nnUNet_train 2d nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nohup nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c &amp;</span><br><span class="line">返回shell</span><br><span class="line">输入exit退出终端</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=0 nnUNet_train 3d_lowres nnUNetTrainerV2 5 4 --npz</span><br><span class="line"></span><br><span class="line">nnUNet_train 3d_lowres nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line">nnUNet_find_best_configuration -m 3d_fullres  -t 5 --strict</span><br><span class="line"></span><br><span class="line">nnUNet_find_best_configuration -m 2d 3d_fullres 3d_lowres 3d_cascade_fullres -t XXX --strict</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=6 nnUNet_predict -i /home/haitaowu/2021summer/final/nnUNetFrame/Res/ct -o /home/haitaowu/2021summer/final/nnUNetFrame/Res/tmp2 -tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 2d -p nnUNetPlansv2.1 -t Task005_Tumour --save_npz</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=0 nnUNet_predict \</span><br><span class="line">-i /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw/nnUNet_raw_data/Task005_Tumour/imagesTs \</span><br><span class="line">-o /home/haitaowu/2021summer/final/nnUNetFrame/Res/tmp \</span><br><span class="line">-tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 3d_fullres -p nnUNetPlansv2.1 -t Task005_Tumour --save_npz</span><br><span class="line"></span><br><span class="line">nnUNet_ensemble -f OUTPUT_DIRECTORY_3D OUTPUT_DIRECTORY_2D -o OUTPUT_FOLDER_ENSEMBLE -pp POSTPROCESSING_FILE</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>比赛运行命令</p>
+<p>1.</p>
+<p>2.</p>
+</li>
+<li><p>?</p>
+</li>
+</ol>
 </body></html>]]></content>
   </entry>
   <entry>
@@ -841,6 +841,22 @@
       </tags>
   </entry>
   <entry>
+    <title>网页前端 框架</title>
+    <url>/2021/09/06/%E7%BD%91%E9%A1%B5%E5%89%8D%E7%AB%AF-%E6%A1%86%E6%9E%B6/</url>
+    <content><![CDATA[<html><head></head><body><h1 id="框架解析："><a href="#框架解析：" class="headerlink" title="框架解析："></a>框架解析：</h1><h2 id="VUE是什么？"><a href="#VUE是什么？" class="headerlink" title="VUE是什么？"></a>VUE是什么？</h2><p>是一个用于创建用户界面的开源JavaScript框架，也是一个创建单页应用的Web应用框架。 2016年一项针对JavaScript的调查表明，Vue有着89%的开发者满意度。</p>
+<p>在GitHub上，该项目平均每天能收获95颗星，[为Github有史以来星标数第3多的项目</p>
+<h2 id="ECharts是什么？"><a href="#ECharts是什么？" class="headerlink" title="ECharts是什么？"></a>ECharts是什么？</h2><p>它是一个数据可视化框架，可以流畅的运行在 PC 和移动设备上，兼容当前绝大部分浏览器，供了 图例、视觉映射、数据区域缩放、tooltip、数据刷选等开箱即用的交互组件，可以对数据进行多维度数据筛取、视图缩放、展示细节等交互操作，让你的数据形象生动起来，不再是简简单单的一个表格。</p>
+<h2 id="AntV是什么？"><a href="#AntV是什么？" class="headerlink" title="AntV是什么？"></a>AntV是什么？</h2><p>蚂蚁金服全新一代数据可视化前端框架，短短几行代码就能够做出精美的数据图表，甚至兼容pc端和移动端。</p>
+<h2 id="Element是什么？"><a href="#Element是什么？" class="headerlink" title="Element是什么？"></a>Element是什么？</h2><p>前端工程师喜爱的css框架，能够提供精美的组件，开箱即用，并且具有良好的兼容性，熟练使用css框架，能够减少大部分开发时间（写界面的时间），从而专注于业务代码的实现。</p>
+<h2 id="Taro是什么？"><a href="#Taro是什么？" class="headerlink" title="Taro是什么？"></a>Taro是什么？</h2><p>在开发中，我们经常烦恼网页一种代码，小程序一种代码，那么到底有没有办法让我们只开发一种，然后可以用在所有的地方呢？</p>
+<p>还真有，这个框架让你的代码在多种环境下都能够跑起来，<strong>Taro，多端统一开发解决方案</strong>，意味着你用这个框架开发出来的项目，能够运行在各个平台上。</p>
+<h2 id="Taro-UI是什么？"><a href="#Taro-UI是什么？" class="headerlink" title="Taro UI是什么？"></a>Taro UI是什么？</h2><p>这是一款基于taro框架开发的多端UI组件库，强大的交互组件，让你的开发更加高效。</p>
+<h2 id="uni-app是什么？"><a href="#uni-app是什么？" class="headerlink" title="uni-app是什么？"></a>uni-app是什么？</h2><p>和Taro一样，也是一个多端统一开发解决方案，但是这个框架熟悉的人比较多，使用的人也比较多，博主也是在使用中一个框架，上手比较快，值得推荐。</p>
+<h2 id="stylus"><a href="#stylus" class="headerlink" title="stylus"></a>stylus</h2><p>强大的css预处理器，让css书写更加随意，可以有函数，变量计算，动态引入，条件表达等等，用了直呼爽，后悔不早用。</p>
+<h2 id="jquery"><a href="#jquery" class="headerlink" title="jquery"></a>jquery</h2><p>jquery不能说为技术，jQuery，顾名思议，也就是JavaScript和查询（Query），即是辅助JavaScript开发的库。</p>
+</body></html>]]></content>
+  </entry>
+  <entry>
     <title>深度学习过拟合</title>
     <url>/2021/09/12/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E8%BF%87%E6%8B%9F%E5%90%88/</url>
     <content><![CDATA[<html><head></head><body><h1 id="1-过拟合是什么？"><a href="#1-过拟合是什么？" class="headerlink" title="1.过拟合是什么？"></a>1.过拟合是什么？</h1><p>过拟合是指在模型参数拟合过程中，由于训练数据包含抽样误差，复杂模型在训练时也将抽样误差进行了很好的拟合。具体表现就是在训练集上效果好，而测试集效果差，模型泛化能力弱。</p>
@@ -876,21 +892,5 @@
         <tag>深度学习</tag>
         <tag>deep learning</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>网页前端 框架</title>
-    <url>/2021/09/06/%E7%BD%91%E9%A1%B5%E5%89%8D%E7%AB%AF-%E6%A1%86%E6%9E%B6/</url>
-    <content><![CDATA[<html><head></head><body><h1 id="框架解析："><a href="#框架解析：" class="headerlink" title="框架解析："></a>框架解析：</h1><h2 id="VUE是什么？"><a href="#VUE是什么？" class="headerlink" title="VUE是什么？"></a>VUE是什么？</h2><p>是一个用于创建用户界面的开源JavaScript框架，也是一个创建单页应用的Web应用框架。 2016年一项针对JavaScript的调查表明，Vue有着89%的开发者满意度。</p>
-<p>在GitHub上，该项目平均每天能收获95颗星，[为Github有史以来星标数第3多的项目</p>
-<h2 id="ECharts是什么？"><a href="#ECharts是什么？" class="headerlink" title="ECharts是什么？"></a>ECharts是什么？</h2><p>它是一个数据可视化框架，可以流畅的运行在 PC 和移动设备上，兼容当前绝大部分浏览器，供了 图例、视觉映射、数据区域缩放、tooltip、数据刷选等开箱即用的交互组件，可以对数据进行多维度数据筛取、视图缩放、展示细节等交互操作，让你的数据形象生动起来，不再是简简单单的一个表格。</p>
-<h2 id="AntV是什么？"><a href="#AntV是什么？" class="headerlink" title="AntV是什么？"></a>AntV是什么？</h2><p>蚂蚁金服全新一代数据可视化前端框架，短短几行代码就能够做出精美的数据图表，甚至兼容pc端和移动端。</p>
-<h2 id="Element是什么？"><a href="#Element是什么？" class="headerlink" title="Element是什么？"></a>Element是什么？</h2><p>前端工程师喜爱的css框架，能够提供精美的组件，开箱即用，并且具有良好的兼容性，熟练使用css框架，能够减少大部分开发时间（写界面的时间），从而专注于业务代码的实现。</p>
-<h2 id="Taro是什么？"><a href="#Taro是什么？" class="headerlink" title="Taro是什么？"></a>Taro是什么？</h2><p>在开发中，我们经常烦恼网页一种代码，小程序一种代码，那么到底有没有办法让我们只开发一种，然后可以用在所有的地方呢？</p>
-<p>还真有，这个框架让你的代码在多种环境下都能够跑起来，<strong>Taro，多端统一开发解决方案</strong>，意味着你用这个框架开发出来的项目，能够运行在各个平台上。</p>
-<h2 id="Taro-UI是什么？"><a href="#Taro-UI是什么？" class="headerlink" title="Taro UI是什么？"></a>Taro UI是什么？</h2><p>这是一款基于taro框架开发的多端UI组件库，强大的交互组件，让你的开发更加高效。</p>
-<h2 id="uni-app是什么？"><a href="#uni-app是什么？" class="headerlink" title="uni-app是什么？"></a>uni-app是什么？</h2><p>和Taro一样，也是一个多端统一开发解决方案，但是这个框架熟悉的人比较多，使用的人也比较多，博主也是在使用中一个框架，上手比较快，值得推荐。</p>
-<h2 id="stylus"><a href="#stylus" class="headerlink" title="stylus"></a>stylus</h2><p>强大的css预处理器，让css书写更加随意，可以有函数，变量计算，动态引入，条件表达等等，用了直呼爽，后悔不早用。</p>
-<h2 id="jquery"><a href="#jquery" class="headerlink" title="jquery"></a>jquery</h2><p>jquery不能说为技术，jQuery，顾名思议，也就是JavaScript和查询（Query），即是辅助JavaScript开发的库。</p>
-</body></html>]]></content>
   </entry>
 </search>
