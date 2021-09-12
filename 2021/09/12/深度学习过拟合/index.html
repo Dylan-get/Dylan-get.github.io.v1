@@ -1,0 +1,220 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>深度学习过拟合 | Mr.Wu's blog</title><meta name="keywords" content="过拟合,深度学习,deep learning"><meta name="author" content="Mr.Wu"><meta name="copyright" content="Mr.Wu"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta property="og:type" content="article">
+<meta property="og:title" content="深度学习过拟合">
+<meta property="og:url" content="http://example.com/2021/09/12/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E8%BF%87%E6%8B%9F%E5%90%88/index.html">
+<meta property="og:site_name" content="Mr.Wu&#39;s blog">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/img/wallpaper-night-sky.jpg">
+<meta property="article:published_time" content="2021-09-12T06:28:18.000Z">
+<meta property="article:modified_time" content="2021-09-12T07:45:20.672Z">
+<meta property="article:author" content="Mr.Wu">
+<meta property="article:tag" content="过拟合">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="deep learning">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/wallpaper-night-sky.jpg"><link rel="shortcut icon" href="/img/book.jpeg"><link rel="canonical" href="http://example.com/2021/09/12/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E8%BF%87%E6%8B%9F%E5%90%88/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"We didn't find any results for the search: ${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '深度学习过拟合',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-09-12 15:45:20'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/icon.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">31</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">22</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">1</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/tags"><i class="fa-fw fas fa-tags"></i><span> tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/wallpaper-night-sky.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Mr.Wu's blog</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/tags"><i class="fa-fw fas fa-tags"></i><span> tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">深度学习过拟合</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2021-09-12T06:28:18.000Z" title="Created 2021-09-12 14:28:18">2021-09-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2021-09-12T07:45:20.672Z" title="Updated 2021-09-12 15:45:20">2021-09-12</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word count:</span><span class="word-count">1.3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading time:</span><span>3min</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="深度学习过拟合"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">Comments:</span><a href="/2021/09/12/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E8%BF%87%E6%8B%9F%E5%90%88/#post-comment"><span class="gitalk-comment-count"></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><html><head></head><body><h1 id="1-过拟合是什么？"><a href="#1-过拟合是什么？" class="headerlink" title="1.过拟合是什么？"></a>1.过拟合是什么？</h1><p>过拟合是指在模型参数拟合过程中，由于训练数据包含抽样误差，复杂模型在训练时也将抽样误差进行了很好的拟合。具体表现就是在训练集上效果好，而测试集效果差，模型泛化能力弱。</p>
+<h1 id="2-解决方式"><a href="#2-解决方式" class="headerlink" title="2.解决方式"></a>2.解决方式</h1><h2 id="2-1-数据增广"><a href="#2-1-数据增广" class="headerlink" title="2.1. 数据增广"></a>2.1. 数据增广</h2><p>通过一定规则扩充数据。可以通过图像平移、翻转、缩放、切割等手段将数据库成倍扩充，可以通过GAN来有效补足数据集</p>
+<h2 id="2-2-正则化"><a href="#2-2-正则化" class="headerlink" title="2.2.正则化"></a>2.2.正则化</h2><h3 id="2-2-1-L1、L2-Loss"><a href="#2-2-1-L1、L2-Loss" class="headerlink" title="2.2.1. L1、L2 Loss"></a>2.2.1. L1、L2 Loss</h3><p>通过限制模型的复杂度来提高泛化能力，比如在损失函数中加入L1范数或者L2范数。这一招在神经网络算法中也会运用到，但是在深层神经网络中，特别是模型参数的数量远大于训练数据的数量的情况下，L1和L2正则化的效果往往不如在浅层机器学习模型中显著。</p>
+<h3 id="2-2-2-DropOut"><a href="#2-2-2-DropOut" class="headerlink" title="2.2.2. DropOut"></a>2.2.2. DropOut</h3><p>在每个训练批次中，通过忽略一半的特征检测器（让一半的隐层节点值为0），可以明显地减少过拟合现象。这种方式可以减少特征检测器（隐层节点）间的相互作用，检测器相互作用是指某些检测器依赖其他检测器才能发挥作用</p>
+<h2 id="2-3-归一化Normalization"><a href="#2-3-归一化Normalization" class="headerlink" title="2.3 归一化Normalization"></a>2.3 归一化Normalization</h2><p>归一化方法</p>
+<ul>
+<li>Batch Normalization，其论文：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1502.03167.pdf">https://arxiv.org/pdf/1502.03167.pdf</a></li>
+<li>Layer Normalizaiton，其论文：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1607.06450v1.pdf">https://arxiv.org/pdf/1607.06450v1.pdf</a></li>
+<li>Instance Normalization，其论文：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1607.08022.pdf">https://arxiv.org/pdf/1607.08022.pdf</a></li>
+<li>Group Normalization，其论文：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1803.08494.pdf">https://arxiv.org/pdf/1803.08494.pdf</a></li>
+<li>Switchable Normalization，其论文：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1806.10779.pdf">https://arxiv.org/pdf/1806.10779.pdf</a></li>
+</ul>
+<p>Q&amp;A:</p>
+<ol>
+<li><p>BN（Batch Normalization）在训练阶段和测试阶段的操作有什么区别，为什么这么做？</p>
+<p>BN在训练阶段，保持计算每一个Batch的均值和方差，BN在训练阶段，计算每个batch的均值和方差，然后通过一个滑动平均值方法保存，在pytorch中，通过一个参数momentum保存每个连续计算的batch的均值和方差的。</p>
+<p>均值是每个batch的均值的均值，方差是每个batch的无偏估计量。但是在pytorch具体实现是采用以上所说的滑动平均值方法计算的，所以最后一旦整个训练阶段完成，</p>
+<p>BN层中的所有参数也就固定下来，然后直接用于test</p>
+<p>因为训练过程中，训练数据是不断流入的，数据分布是变化的，根据已经输入的数据即已经输入的batch数据来通过均值，与无偏估计的方差来 估计真实的全部数据分布，有助于实现较好的归一化效果，而测试过程中，因为模型经过训练，BN参数已经在训练集合上优化完毕，若再在测试集上更改参数，可能会导致过拟合现象</p>
+</li>
+<li><p>若未做归一化会出现什么问题？</p>
+<p>神经网络学习过程的<strong>本质就是为了学习数据分布</strong>，如果我们没有做归一化处理，那么每一批次训练数据的分布不一样，从大的方向上看，神经网络则需要在这多个分布中找到平衡点，从小的方向上看，由于每层网络输入数据分布在不断变化，这也会导致每层网络在找平衡点，显然，<strong>神经网络就很难收敛了</strong>。</p>
+</li>
+</ol>
+<h2 id="2-4-调节超参数"><a href="#2-4-调节超参数" class="headerlink" title="2.4 调节超参数"></a>2.4 调节超参数</h2><p>更大的学习率，更小的轮次时，模型会增加对共同特征的关注，提升模型泛化能力。</p>
+<h2 id="2-5-早停法"><a href="#2-5-早停法" class="headerlink" title="2.5 早停法"></a>2.5 早停法</h2><p>顾名思义就是更早地停止模型的训练。具体做法是准备一个验证集，在模型的训练过程中不断地使用验证集验证模型的训练结果，当模型在验证集上的错误率不再下降或者下降极其缓慢时，及时停止模型训练。从模型训练的角度来理解就是：假设在训练集阶段存在一个时刻是过拟合发生的时间点，那么在训练阶段的错误率在经过这个过拟合点后仍会继续下降因此导致了过拟合的发生，但是如果设定一个验证集，在这个过拟合点发生的时刻模型在验证集上的表现会发生一个拐点，即在过拟合点之前，验证集的错误率继续下降，但是在过拟合点之后验证集的错误率反而上升。所以只要发现在验证集上模型的错误率开始上升时就可以实施早停法停止对模型的训练。因此，要使用早停法需要训练和验证并行或交叉进行</p>
+<h2 id="2-6-标签平滑"><a href="#2-6-标签平滑" class="headerlink" title="2.6 标签平滑"></a>2.6 标签平滑</h2><p>通过给样本的输出引入噪声来避免过拟合</p>
+</body></html></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">Mr.Wu</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://example.com/2021/09/12/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E8%BF%87%E6%8B%9F%E5%90%88/">http://example.com/2021/09/12/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E8%BF%87%E6%8B%9F%E5%90%88/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%BF%87%E6%8B%9F%E5%90%88/">过拟合</a><a class="post-meta__tags" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><a class="post-meta__tags" href="/tags/deep-learning/">deep learning</a></div><div class="post_share"><div class="social-share" data-image="/img/wallpaper-night-sky.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2021/09/06/zip/"><img class="next-cover" src="/img/wallpaper-night-sky.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">zip、tar、gzip  打包与压缩</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div id="gitalk-container"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Mr.Wu</div><div class="author-info__description"></div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">31</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">22</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">1</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Dylan-get"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/Dylan-get" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">Welcome to my blog, I will write some interesting here.</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E8%BF%87%E6%8B%9F%E5%90%88%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">1.</span> <span class="toc-text">1.过拟合是什么？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F"><span class="toc-number">2.</span> <span class="toc-text">2.解决方式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%B9%BF"><span class="toc-number">2.1.</span> <span class="toc-text">2.1. 数据增广</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E6%AD%A3%E5%88%99%E5%8C%96"><span class="toc-number">2.2.</span> <span class="toc-text">2.2.正则化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-1-L1%E3%80%81L2-Loss"><span class="toc-number">2.2.1.</span> <span class="toc-text">2.2.1. L1、L2 Loss</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2-DropOut"><span class="toc-number">2.2.2.</span> <span class="toc-text">2.2.2. DropOut</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-%E5%BD%92%E4%B8%80%E5%8C%96Normalization"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 归一化Normalization</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-%E8%B0%83%E8%8A%82%E8%B6%85%E5%8F%82%E6%95%B0"><span class="toc-number">2.4.</span> <span class="toc-text">2.4 调节超参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-5-%E6%97%A9%E5%81%9C%E6%B3%95"><span class="toc-number">2.5.</span> <span class="toc-text">2.5 早停法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-6-%E6%A0%87%E7%AD%BE%E5%B9%B3%E6%BB%91"><span class="toc-number">2.6.</span> <span class="toc-text">2.6 标签平滑</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/09/12/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E8%BF%87%E6%8B%9F%E5%90%88/" title="深度学习过拟合"><img src="/img/wallpaper-night-sky.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="深度学习过拟合"/></a><div class="content"><a class="title" href="/2021/09/12/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E8%BF%87%E6%8B%9F%E5%90%88/" title="深度学习过拟合">深度学习过拟合</a><time datetime="2021-09-12T06:28:18.000Z" title="Created 2021-09-12 14:28:18">2021-09-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/09/06/zip/" title="zip、tar、gzip  打包与压缩"><img src="/img/wallpaper-night-sky.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="zip、tar、gzip  打包与压缩"/></a><div class="content"><a class="title" href="/2021/09/06/zip/" title="zip、tar、gzip  打包与压缩">zip、tar、gzip  打包与压缩</a><time datetime="2021-09-06T07:26:50.000Z" title="Created 2021-09-06 15:26:50">2021-09-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/09/06/%E7%BD%91%E9%A1%B5%E5%89%8D%E7%AB%AF-%E6%A1%86%E6%9E%B6/" title="网页前端 框架"><img src="/img/wallpaper-night-sky.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="网页前端 框架"/></a><div class="content"><a class="title" href="/2021/09/06/%E7%BD%91%E9%A1%B5%E5%89%8D%E7%AB%AF-%E6%A1%86%E6%9E%B6/" title="网页前端 框架">网页前端 框架</a><time datetime="2021-09-06T07:16:33.000Z" title="Created 2021-09-06 15:16:33">2021-09-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/09/05/python-%E5%8C%85%E7%AE%A1%E7%90%86%E4%B8%8E%E7%9B%AE%E5%BD%95%E7%AE%A1%E7%90%86/" title="python 包管理与目录管理"><img src="/img/wallpaper-night-sky.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="python 包管理与目录管理"/></a><div class="content"><a class="title" href="/2021/09/05/python-%E5%8C%85%E7%AE%A1%E7%90%86%E4%B8%8E%E7%9B%AE%E5%BD%95%E7%AE%A1%E7%90%86/" title="python 包管理与目录管理">python 包管理与目录管理</a><time datetime="2021-09-05T13:40:44.000Z" title="Created 2021-09-05 21:40:44">2021-09-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/09/05/ML-lab3/" title="ML-lab3 图像分类"><img src="/img/wallpaper-night-sky.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ML-lab3 图像分类"/></a><div class="content"><a class="title" href="/2021/09/05/ML-lab3/" title="ML-lab3 图像分类">ML-lab3 图像分类</a><time datetime="2021-09-05T13:10:39.000Z" title="Created 2021-09-05 21:10:39">2021-09-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By Mr.Wu</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">Local search</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search for Posts" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script>function addGitalkSource () {
+  const ele = document.createElement('link')
+  ele.rel = 'stylesheet'
+  ele.href= 'https://cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.css'
+  document.getElementsByTagName('head')[0].appendChild(ele)
+}
+
+function loadGitalk () {
+  function initGitalk () {
+    var gitalk = new Gitalk(Object.assign({
+      clientID: 'ff89230797eb4157f2d6',
+      clientSecret: '368a8ef1161e6777e3f153574d691f03555c07c5',
+      repo: 'blog-comment',
+      owner: 'Dylan-get',
+      admin: ['Dylan-get'],
+      id: '7bbd740b5482813f61cc66e88b9d9642',
+      updateCountCallback: commentCount
+    },null))
+
+    gitalk.render('gitalk-container')
+  }
+
+  if (typeof Gitalk === 'function') initGitalk()
+  else {
+    addGitalkSource()
+    getScript('https://cdn.jsdelivr.net/npm/gitalk@latest/dist/gitalk.min.js').then(initGitalk)
+  }
+}
+
+function commentCount(n){
+  let isCommentCount = document.querySelector('#post-meta .gitalk-comment-count')
+  if (isCommentCount) {
+    isCommentCount.innerHTML= n
+  }
+}
+
+if ('Gitalk' === 'Gitalk' || !false) {
+  if (false) btf.loadComment(document.getElementById('gitalk-container'), loadGitalk)
+  else loadGitalk()
+} else {
+  function loadOtherComment () {
+    loadGitalk()
+  }
+}</script></div><script defer src="/live2d-widget/autoload.js"></script><script id="click-show-text" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-show-text.min.js" data-mobile="false" data-text="I,LOVE,YOU" data-fontsize="15px" data-random="false" async="async"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
