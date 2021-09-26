@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>KG-EXAM</title>
-    <url>/2021/09/01/KG-EXAM/</url>
-    <content><![CDATA[<html><head></head><body><p>1.下载jdk</p>
-</body></html>]]></content>
-  </entry>
-  <entry>
     <title>lab1 聚类算法——k-means聚类</title>
     <url>/2021/08/24/ML-lab1/</url>
     <content><![CDATA[<html><head></head><body><p>内容：使用K-means算法实现图像压缩，分别在自己的3张图片和指定数据集上进行实验</p>
@@ -67,6 +61,598 @@
         <tag>微服务</tag>
         <tag>开放</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>PCA</title>
+    <url>/2021/08/30/PCA/</url>
+    <content><![CDATA[<html><head></head><body><h1 id="原理："><a href="#原理：" class="headerlink" title="原理："></a>原理：</h1><p>PCA(Principal Component Analysis)，即主成分分析方法，是一种使用最广泛的数据降维算法。PCA的主要思想是将n维特征映射到k维上，这k维是全新的正交特征也被称为主成分，是在原有n维特征的基础上重新构造出来的k维特征。PCA的工作就是从原始的空间中顺序地找一组相互正交的坐标轴，新的坐标轴的选择与数据本身是密切相关的。其中，第一个新坐标轴选择是原始数据中方差最大的方向，第二个新坐标轴选取是与第一个坐标轴正交的平面中使得方差最大的，第三个轴是与第1,2个轴正交的平面中方差最大的。依次类推，可以得到n个这样的坐标轴。通过这种方式获得的新的坐标轴，我们发现，大部分方差都包含在前面k个坐标轴中，后面的坐标轴所含的方差几乎为0。于是，我们可以忽略余下的坐标轴，只保留前面k个含有绝大部分方差的坐标轴。事实上，这相当于只保留包含绝大部分方差的维度特征，而忽略包含方差几乎为0的特征维度，实现对数据特征的降维处理。</p>
+<h1 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h1><h2 id="sklearn官方："><a href="#sklearn官方：" class="headerlink" title="sklearn官方："></a>sklearn官方：</h2><p>n_components:  </p>
+<p>意义：PCA算法中所要保留的主成分个数n，也即保留下来的特征个数n</p>
+<p>类型：int 或者 string，缺省时默认为None，所有成分被保留。</p>
+<pre><code>      赋值为int，比如n_components=1，将把原始数据降到一个维度。
+
+      赋值为string，比如n_components='mle'，将自动选取特征个数n，使得满足所要求的方差百分比。
+</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sklearnPCA</span>(<span class="params">n_components=<span class="number">36</span></span>):</span></span><br><span class="line">    <span class="comment"># count=int(math.sqrt(n_components))</span></span><br><span class="line">    count=<span class="number">6</span></span><br><span class="line">    </span><br><span class="line">    data=getData()</span><br><span class="line">    pca = PCA(n_components=n_components)</span><br><span class="line">    pca.fit(data)</span><br><span class="line">    components=pca.components_</span><br><span class="line">    <span class="built_in">print</span>(components.shape)</span><br><span class="line">    tmpArray=np.zeros((<span class="number">32</span>*count,<span class="number">32</span>*count))</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">36</span>):</span><br><span class="line">        <span class="built_in">print</span>(i)</span><br><span class="line">        row=<span class="built_in">int</span>(i/count)</span><br><span class="line">        col=i%count</span><br><span class="line">        tmpArray[row*<span class="number">32</span>:row*<span class="number">32</span>+<span class="number">32</span>,col*<span class="number">32</span>:col*<span class="number">32</span>+<span class="number">32</span>]=components[i].reshape(<span class="number">32</span>,<span class="number">32</span>)</span><br><span class="line">    </span><br><span class="line">    tmpArray=(tmpArray*<span class="number">255</span>).astype(<span class="string">'uint8'</span>)</span><br><span class="line">    <span class="built_in">print</span>(tmpArray.shape)</span><br><span class="line">    image=Image.fromarray(tmpArray,mode=<span class="string">'L'</span>)</span><br><span class="line">    </span><br><span class="line">    image.save(<span class="string">'./res/sklearn-norm1-n40.png'</span>)</span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h2 id="手写PCA"><a href="#手写PCA" class="headerlink" title="手写PCA:"></a>手写PCA:</h2><figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">myPCA</span>():</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self,data,n_components</span>):</span></span><br><span class="line">        self.data=data</span><br><span class="line">        self.dim=data.shape[<span class="number">0</span>]</span><br><span class="line">        self.n_components=n_components</span><br><span class="line">        <span class="keyword">if</span> self.n_components&gt;self.data.shape[<span class="number">0</span>]:</span><br><span class="line">            <span class="keyword">raise</span> ValueError(<span class="string">"n_components error , too large"</span>)</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cov</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment">#求x的协方差矩阵</span></span><br><span class="line">        x_T = np.transpose(self.data)                           </span><br><span class="line">        x_cov = np.cov(x_T)                                 </span><br><span class="line">        <span class="keyword">return</span> x_cov</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_feature</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment">#求协方差矩阵C的特征值和特征向量</span></span><br><span class="line">        x_cov = self.cov()</span><br><span class="line">        a, b = np.linalg.eig(x_cov)</span><br><span class="line">        m = a.shape[<span class="number">0</span>] <span class="comment">#特征值个数</span></span><br><span class="line">        c = np.hstack((a.reshape((m,<span class="number">1</span>)), b))</span><br><span class="line">        c_df = pd.DataFrame(c)</span><br><span class="line">        c_df_sort = c_df.sort_values(by=<span class="number">0</span>,axis=<span class="number">0</span>, ascending=<span class="literal">False</span>)    </span><br><span class="line">        <span class="keyword">return</span> c_df_sort</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">explained_varience_</span>(<span class="params">self</span>):</span></span><br><span class="line">        c_df_sort=self.get_feature()</span><br><span class="line">        <span class="keyword">return</span> c_df_sort.values[:,<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">reduce_dimension</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment">#指定维度降维和根据方差降维</span></span><br><span class="line">        c_df_sort = self.get_feature()</span><br><span class="line">        varience = self.explained_varience_()</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">if</span> self.n_components:                                <span class="comment">#指定降维维度</span></span><br><span class="line">            p = c_df_sort.values[<span class="number">0</span>:self.n_components, <span class="number">1</span>:]</span><br><span class="line">            y = np.dot(p, np.transpose(self.data))              </span><br><span class="line">            <span class="keyword">return</span> np.transpose(y)</span><br><span class="line"> </span><br><span class="line">        varience_sum = <span class="built_in">sum</span>(varience)                         </span><br><span class="line">        varience_radio = varience / varience_sum</span><br><span class="line"> </span><br><span class="line">        varience_contribution = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> R <span class="keyword">in</span> <span class="built_in">range</span>(self.dimension):</span><br><span class="line">            varience_contribution += varience_radio[R]       </span><br><span class="line">            <span class="keyword">if</span> varience_contribution &gt;= <span class="number">0.99</span>:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line"> </span><br><span class="line">        p = c_df_sort.values[<span class="number">0</span>:R+<span class="number">1</span>, <span class="number">1</span>:]                      <span class="comment">#取前R个特征向量</span></span><br><span class="line">        y = np.dot(p, np.transpose(self.x))                  </span><br><span class="line">        <span class="keyword">return</span> np.transpose(y)</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+
+
+
+
+<h1 id="可视化效果："><a href="#可视化效果：" class="headerlink" title="可视化效果："></a>可视化效果：</h1><h2 id="Sklearn-face"><a href="#Sklearn-face" class="headerlink" title="Sklearn-face"></a>Sklearn-face</h2><p><img src="/2021/08/30/PCA/sklearn-norm1-n16.png" alt="sklearn-norm1-n16"></p>
+<h3 id="Sklearn-2D"><a href="#Sklearn-2D" class="headerlink" title="Sklearn-2D:"></a>Sklearn-2D:</h3><p><img src="/2021/08/30/PCA/sklearn-2dV.png" alt="sklearn-2dV"></p>
+<h2 id="Sklearn-3D"><a href="#Sklearn-3D" class="headerlink" title="Sklearn-3D:"></a>Sklearn-3D:</h2><p><img src="/2021/08/30/PCA/sklearn-3dV.png" alt="sklearn-3dV"></p>
+<h2 id="手写-face"><a href="#手写-face" class="headerlink" title="手写-face"></a>手写-face</h2><p><img src="/2021/08/30/PCA/wht-norm1-n256.png" alt="wht-norm1-n256"></p>
+<h2 id="手写-2D："><a href="#手写-2D：" class="headerlink" title="手写-2D："></a>手写-2D：</h2><p><img src="/2021/08/30/PCA/wht-2dV.png" alt="wht-2dV"></p>
+<h2 id="手写-3D："><a href="#手写-3D：" class="headerlink" title="手写-3D："></a>手写-3D：</h2><p><img src="/2021/08/30/PCA/wht-3dV.png" alt="wht-3dV"></p>
+</body></html>]]></content>
+      <tags>
+        <tag>ML</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Paddle Seg的使用</title>
+    <url>/2021/08/16/Paddle-Seg/</url>
+    <content><![CDATA[<html><head></head><body><h3 id="1-安装paddlepaddle："><a href="#1-安装paddlepaddle：" class="headerlink" title="1.安装paddlepaddle："></a>1.安装paddlepaddle：</h3><p><a href="https://www.paddlepaddle.org.cn/">官网</a>找到符合的版本，安装即可</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">python -m pip install paddlepaddle-gpu==2.1.2.post101 -f https://www.paddlepaddle.org.cn/whl/linux/mkl/avx/stable.html</span><br><span class="line"></span><br><span class="line">或</span><br><span class="line"></span><br><span class="line">conda install paddlepaddle-gpu==2.1.2 cudatoolkit=10.1 --channel https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/Paddle/</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h3 id="2-在github下载相应源码"><a href="#2-在github下载相应源码" class="headerlink" title="2.在github下载相应源码"></a>2.在github下载相应源码</h3><p><a href="https://github.com/PaddlePaddle/PaddleSeg">网址</a></p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/PaddlePaddle/PaddleSeg.git</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h3 id="3-开始自己的项目"><a href="#3-开始自己的项目" class="headerlink" title="3.开始自己的项目"></a>3.开始自己的项目</h3><p><a href="https://github.com/PaddlePaddle/PaddleSeg/blob/release/2.2/docs/install_cn.md">官方参考文档</a></p>
+<h4 id="3-1创建自己的数据集合"><a href="#3-1创建自己的数据集合" class="headerlink" title="3.1创建自己的数据集合"></a>3.1创建自己的数据集合</h4><h4 id="3-2更改config设置，选择自己需要的模型和loss"><a href="#3-2更改config设置，选择自己需要的模型和loss" class="headerlink" title="3.2更改config设置，选择自己需要的模型和loss"></a>3.2更改config设置，选择自己需要的模型和loss</h4><h4 id="3-3训练与评估"><a href="#3-3训练与评估" class="headerlink" title="3.3训练与评估"></a>3.3训练与评估</h4></body></html>]]></content>
+      <tags>
+        <tag>Paddle Seg</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MY FIRST BLOG</title>
+    <url>/2021/08/12/blog/</url>
+    <content><![CDATA[<html><head></head><body><p>Welcome to My Blog(<a href="https://dylan-get.github.io/">https://dylan-get.github.io/</a>)! Store something insteresting here!</p>
+</body></html>]]></content>
+      <categories>
+        <category>Diary</category>
+      </categories>
+      <tags>
+        <tag>first</tag>
+        <tag>try</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>blog搭建-Hexo</title>
+    <url>/2021/08/13/blog%E6%90%AD%E5%BB%BA-hexo/</url>
+    <content><![CDATA[<html><head></head><body><p>Hexo 是一个基于<a href="http://www.oschina.net/p/nodejs">nodejs</a> 的静态博客网站生成器，作者是来自台湾的 <a href="http://mailto:tommy351@gmail.com/">Tommy Chen</a>，支持许多不同的theme来美化blog。</p>
+<h2 id="Blog搭建过程如下："><a href="#Blog搭建过程如下：" class="headerlink" title="Blog搭建过程如下："></a>Blog搭建过程如下：</h2><h3 id="1-配置基本运行环境"><a href="#1-配置基本运行环境" class="headerlink" title="1.配置基本运行环境"></a>1.配置基本运行环境</h3><h4 id="安装nvm："><a href="#安装nvm：" class="headerlink" title="安装nvm："></a>安装nvm：</h4><p>nvm（Node Version Manager）是一个开源的node.js多版本管理Bash工具，类似于Python中的pyenv工具，用于在Bash环境中随意切换已安装的node版本</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line"></span><br><span class="line">curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash</span><br><span class="line"></span><br><span class="line">or</span><br><span class="line"></span><br><span class="line">wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="安装Node-js"><a href="#安装Node-js" class="headerlink" title="安装Node.js"></a>安装Node.js</h4><figure class="highlight shell"><table><tbody><tr><td class="code"><pre><span class="line">nvm install node</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h4 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h4><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h4 id="安装hexo-deployer-git"><a href="#安装hexo-deployer-git" class="headerlink" title="安装hexo-deployer-git"></a>安装hexo-deployer-git</h4><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="2-初识博客"><a href="#2-初识博客" class="headerlink" title="2.初识博客"></a>2.初识博客</h3><h4 id="初始化："><a href="#初始化：" class="headerlink" title="初始化："></a>初始化：</h4><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">hexo init</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h4 id="生成静态网页："><a href="#生成静态网页：" class="headerlink" title="生成静态网页："></a>生成静态网页：</h4><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">hexo g</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h4 id="启动服务器："><a href="#启动服务器：" class="headerlink" title="启动服务器："></a>启动服务器：</h4><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">hexo s</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+
+
+<h3 id="3-美化博客"><a href="#3-美化博客" class="headerlink" title="3.美化博客"></a>3.美化博客</h3><p>从hexo<a href="https://hexo.io/themes/">官方网址</a>选择喜欢的主题，并参考相关项目github中的指引，完成环境配置和主题设置，以butterfly为例：</p>
+<p>下载文件到 /themes/butterfly，并将blog项目根目录的_config.yml的主题更改为butterfly。</p>
+</body></html>]]></content>
+      <tags>
+        <tag>Hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>hexo images</title>
+    <url>/2021/08/18/hexo-images/</url>
+    <content><![CDATA[<html><head></head><body><h3 id="设置post-asset-folder-true"><a href="#设置post-asset-folder-true" class="headerlink" title="设置post_asset_folder: true"></a>设置post_asset_folder: <strong>true</strong></h3><img src="/2021/08/18/hexo-images/post_asset.png" class="" title="图片">
+
+<h3 id="工程目录下执行"><a href="#工程目录下执行" class="headerlink" title="工程目录下执行"></a>工程目录下执行</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">hexo new post <span class="string">'hexo images'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>即在post文件夹下建立与md同名的文件夹</p>
+<h3 id="插入图片格式"><a href="#插入图片格式" class="headerlink" title="插入图片格式:"></a>插入图片格式:</h3><h4 id="格式1"><a href="#格式1" class="headerlink" title="格式1:"></a>格式1:</h4><figure class="highlight markdown"><table><tbody><tr><td class="code"><pre><span class="line">{% asset<span class="emphasis">_img streamlit_</span>hello.png 测试图片 %}</span><br></pre></td></tr></tbody></table></figure>
+
+<img src="/2021/08/18/hexo-images/streamlit_hello.png" class="" title="测试图片">
+
+<p>其中<em>测试图片</em>为title属性，当鼠标移动该图片位置显示该内容</p>
+<h4 id="格式2："><a href="#格式2：" class="headerlink" title="格式2："></a>格式2：</h4><figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">![404 not found](streamlit_hello.png)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>其中*[404 not found]*为其alt属性，在不能正常显示时显示的文字</p>
+<p><img src="/2021/08/18/hexo-images/streamlit_hello.png" alt="404 not found"></p>
+</body></html>]]></content>
+      <categories>
+        <category>Diary</category>
+      </categories>
+      <tags>
+        <tag>Hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>hexo live2d</title>
+    <url>/2021/08/18/hexo-live2d/</url>
+    <content><![CDATA[<html><head></head><body><p><a href="https://akilar.top/posts/5b8f515f/">参考网址</a></p>
+<ol>
+<li><p>以 <code>Butterfly</code> 主题为例，在 <code>[Blogroot]\themes\butterfly\source\</code> 目录下打开终端，输入</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/stevenjoezhang/live2d-widget.git live2d-widget</span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>找到路径 <code>[Blogroot]\themes\butterfly\source\live2d-widget\autoload.js</code>，打开 <code>autoload.js</code>，修改内容：</p>
+<figure class="highlight diff"><table><tbody><tr><td class="code"><pre><span class="line"><span class="deletion">- const live2d_path = "https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget/";</span></span><br><span class="line"><span class="addition">+ const live2d_path = "/live2d-widget/";</span></span><br></pre></td></tr></tbody></table></figure></li>
+<li><p> 在 <code>Butterfly</code> 的主题配置文件 <code>[Blogroot]\themes\_config.yml</code> 中，<code>butterfly</code> 主题其实自带 <code>fontawesome</code> 依赖，只需引入</p>
+</li>
+</ol>
+   <figure class="highlight diff"><table><tbody><tr><td class="code"><pre><span class="line">    # Inject</span><br><span class="line">    # Insert the code to head (before '&lt;/head&gt;' tag) and the bottom (before '&lt;/body&gt;' tag)</span><br><span class="line">    # 插入代码到头部 &lt;/head&gt; 之前 和 底部 &lt;/body&gt; 之前</span><br><span class="line">    inject:</span><br><span class="line">      head:</span><br><span class="line">        # - &lt;link rel="stylesheet" href="/xxx.css"&gt;</span><br><span class="line">      bottom:</span><br><span class="line">        # - &lt;script src="xxxx"&gt;&lt;/script&gt;</span><br><span class="line"><span class="addition">+       - &lt;script defer src="/live2d-widget/autoload.js"&gt;&lt;/script&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+</body></html>]]></content>
+      <tags>
+        <tag>Hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>hexo search</title>
+    <url>/2021/08/18/hexo-search/</url>
+    <content><![CDATA[<html><head></head><body><h3 id="1-安装-hexo-generator-searchdb，在站点的根目录下执行以下命令："><a href="#1-安装-hexo-generator-searchdb，在站点的根目录下执行以下命令：" class="headerlink" title="1.安装 hexo-generator-searchdb，在站点的根目录下执行以下命令："></a>1.安装 <code>hexo-generator-searchdb</code>，在站点的根目录下执行以下命令：</h3><figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">npm install hexo-generator-searchdb --save</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h3 id="2-编辑主题配置文件，启用本地搜索功能："><a href="#2-编辑主题配置文件，启用本地搜索功能：" class="headerlink" title="2.编辑主题配置文件，启用本地搜索功能："></a>2.编辑主题配置文件，启用本地搜索功能：</h3><figure class="highlight yaml"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment"># Local search</span></span><br><span class="line"><span class="attr">local_search:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h3 id="3-编辑主题配置文件，新增以下内容："><a href="#3-编辑主题配置文件，新增以下内容：" class="headerlink" title="3.编辑主题配置文件，新增以下内容："></a>3.编辑主题配置文件，新增以下内容：</h3><figure class="highlight yaml"><table><tbody><tr><td class="code"><pre><span class="line"><span class="attr">search:</span></span><br><span class="line">  <span class="attr">path:</span> <span class="string">search.xml</span></span><br><span class="line">  <span class="attr">field:</span> <span class="string">post</span></span><br><span class="line">  <span class="attr">format:</span> <span class="string">html</span></span><br><span class="line">  <span class="attr">limit:</span> <span class="number">10000</span></span><br></pre></td></tr></tbody></table></figure>
+
+</body></html>]]></content>
+      <tags>
+        <tag>Hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hexo comment</title>
+    <url>/2021/08/18/hexo-comment/</url>
+    <content><![CDATA[<html><head></head><body><ol>
+<li><h4 id="找到主题配置文件的对应配置项目"><a href="#找到主题配置文件的对应配置项目" class="headerlink" title="找到主题配置文件的对应配置项目"></a>找到主题配置文件的对应配置项目</h4><img src="/2021/08/18/hexo-comment/comment_code.png" class="" title="配置">
+
+<p>创建 OAuth Application</p>
+<p><a href="https://github.com/settings/developers">https://github.com/settings/developers</a></p>
+<img src="/2021/08/18/hexo-comment/comment_createApp.png" class="">
+
+<p>1）Application name 可以随便填一个。</p>
+<p>2）Homepage URL 必须是博客仓库的域名（GitHub Pages ）</p>
+<p>3）Authorization callback URL 必须是博客的域名</p>
+<img src="/2021/08/18/hexo-comment/comment_createApp2.png" class=""></li>
+<li><h4 id="创建评论仓库"><a href="#创建评论仓库" class="headerlink" title="创建评论仓库"></a>创建评论仓库</h4></li>
+<li><h4 id="修改主题配置"><a href="#修改主题配置" class="headerlink" title="修改主题配置"></a>修改主题配置</h4></li>
+</ol>
+<figure class="highlight yaml"><table><tbody><tr><td class="code"><pre><span class="line"><span class="attr">comments:</span></span><br><span class="line">  <span class="comment"># Up to two comments system, the first will be shown as default</span></span><br><span class="line">  <span class="comment"># Choose: Disqus/Disqusjs/Livere/Gitalk/Valine/Waline/Utterances/Facebook Comments/Twikoo</span></span><br><span class="line">  <span class="attr">use:</span></span><br><span class="line">  <span class="comment"># - Valine</span></span><br><span class="line">  <span class="comment"># - Disqus</span></span><br><span class="line">  <span class="comment"># - Livere</span></span><br><span class="line">   <span class="bullet">-</span> <span class="string">Gitalk</span></span><br><span class="line">  <span class="attr">text:</span> <span class="literal">true</span> <span class="comment"># Display the comment name next to the button</span></span><br><span class="line">  <span class="comment"># lazyload: The comment system will be load when comment element enters the browser's viewport.</span></span><br><span class="line">  <span class="comment"># If you set it to true, the comment count will be invalid</span></span><br><span class="line">  <span class="attr">lazyload:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">count:</span> <span class="literal">true</span> <span class="comment"># Display comment count in post's top_img</span></span><br><span class="line">  <span class="attr">card_post_count:</span> <span class="literal">true</span> <span class="comment"># Display comment count in Home Page</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+
+
+
+<figure class="highlight yaml"><table><tbody><tr><td class="code"><pre><span class="line"><span class="attr">gitalk:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">client_id:</span> <span class="string">xxxxxxxxxxxxxxx</span></span><br><span class="line">  <span class="attr">client_secret:</span> <span class="string">xxxxxxxxxxxxxxx</span></span><br><span class="line">  <span class="attr">repo:</span> <span class="string">blog-comment</span></span><br><span class="line">  <span class="attr">owner:</span> <span class="string">Dylan-get</span></span><br><span class="line">  <span class="attr">admin:</span> <span class="string">Dylan-get</span></span><br><span class="line">  <span class="attr">option:</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+
+
+
+
+
+
+
+<h4 id="BUG1：Hexo集成Gittalk报Error-not-found："><a href="#BUG1：Hexo集成Gittalk报Error-not-found：" class="headerlink" title="BUG1：Hexo集成Gittalk报Error not found："></a>BUG1：Hexo集成Gittalk报Error not found：</h4><img src="/2021/08/18/hexo-comment/comment_bug1.png" class="" title="配置">
+
+<p><a href="http://zyjbml.cn/2019/12/20/gittalk-one/">参考网址</a></p>
+<p>解决方案：将评论仓库设置为公开</p>
+<h4 id="BUG2：未找到相关的-Issues-进行评论，请联系xxx初始化创建"><a href="#BUG2：未找到相关的-Issues-进行评论，请联系xxx初始化创建" class="headerlink" title="BUG2：未找到相关的 Issues 进行评论，请联系xxx初始化创建"></a>BUG2：未找到相关的 Issues 进行评论，请联系xxx初始化创建</h4><p><a href="https://blog.csdn.net/gaocongzhi/article/details/116567800?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_title~default-1.control&amp;spm=1001.2101.3001.4242">参考网址</a></p>
+<p>该评论仓库中的settings设置开启issue评论，初始化 issues。点击issues栏，create an issue。</p>
+<h3 id="效果："><a href="#效果：" class="headerlink" title="效果："></a>效果：</h3><img src="/2021/08/18/hexo-comment/comment.png" class="">
+</body></html>]]></content>
+      <tags>
+        <tag>Hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>medical segmentation</title>
+    <url>/2021/08/20/medical-segmentation/</url>
+    <content><![CDATA[<html><head></head><body><ol>
+<li><h3 id="nii-gz-和-nii文件"><a href="#nii-gz-和-nii文件" class="headerlink" title=".nii.gz 和.nii文件"></a>.nii.gz 和.nii文件</h3><p>区域：喉癌和下咽癌癌灶，都是发生在咽喉部位的恶性肿瘤疾病。</p>
+<p>患有下咽癌，多数患者都会出现明显的临床症状表现，主要有咽喉部异物感、吞咽疼痛以及颈部肿块、声嘶、咯血、呼吸困难等。而喉癌的症状主要有声音嘶哑、吞咽困难、呼吸困难、痰中带血等</p>
+<p>下咽癌诊断方法多，常用的主要有六种，分别是颈部检查、喉咽部检查、细胞学检查、MRI检查(核磁共振成像)、喉X线体层拍片检查、常规X线检查等。而喉癌的诊断方法主要有喉镜检查、病理组织活检、CT检查、超声检查等。</p>
+<p>图像：增强 CT 成像</p>
+<p>标准NIfTI图像的扩展名是.nii，包含了头文件及图像资料。由于NIfTI格式和Analyze格式的关系，因此NIfTI格式也可使用独立的图像文件[.img]和头文件[.hdr]。</p>
+<p>nii格式和.nii.gz格式是一个东西，freesurfer中可以直接调用除了dicom和.nii.gz也可以直接调用.nii</p>
+<p>python可使用sitk查看</p>
+<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> SimpleITK <span class="keyword">as</span> sitk</span><br><span class="line">itk_img = sitk.ReadImage(os.path.join(imageDir,ele))   <span class="comment">#（X，Y，Z）</span></span><br><span class="line">img = sitk.GetArrayFromImage(itk_img)</span><br><span class="line"></span><br><span class="line">name=<span class="string">'001'</span></span><br><span class="line">out = sitk.GetImageFromArray(img)</span><br><span class="line">sitk.WriteImage(out,os.path.join(outdir,name+<span class="string">'.nii.gz'</span>))</span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>评价指标</p>
+</li>
+<li><p>Sota 模型</p>
+<p><a href="https://github.com/JunMa11/SOTA-MedSeg">截止到2021.1的sota模型</a></p>
+<p><a href="https://github.com/MIC-DKFZ/nnUNet">nnUet</a></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">conda install pytorch==1.8.0 torchvision==0.9.0 torchaudio==0.8.0 cudatoolkit=10.2 -c pytorch</span><br><span class="line">pip install nnunet</span><br><span class="line"></span><br><span class="line">pip install --upgrade git+https://github.com/FabianIsensee/hiddenlayer.git@more_plotted_details#egg=hiddenlayer</span><br><span class="line"></span><br><span class="line">vim ~/.bashrc</span><br><span class="line">export nnUNet_raw_data_base="/home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw"                   </span><br><span class="line">export nnUNet_preprocessed="/home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_preprocessed"</span><br><span class="line">export RESULTS_FOLDER="/home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_trained_models"</span><br><span class="line">source ~/.bashrc</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line">nnUNet_convert_decathlon_task -i /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw/nnUNet_raw_data/Task05_Tumour</span><br><span class="line"></span><br><span class="line">nnUNet_plan_and_preprocess -t 5 --verify_dataset_integrity</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=1 nnUNet_train 2d nnUNetTrainerV2 5 0  --npz</span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=2 nnUNet_train 2d nnUNetTrainerV2 5 1</span><br><span class="line"></span><br><span class="line">nohup sh s2df1.sh &gt;fold1 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=3 nnUNet_train 2d nnUNetTrainerV2 5 2</span><br><span class="line"></span><br><span class="line">nohup sh s2df2.sh &gt;2d-fold2 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_train 3d_fullres nnUNetTrainerV2 5 3 -c --npz</span><br><span class="line"></span><br><span class="line">nohup sh s2df3.sh &gt;2d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=5 nnUNet_train 2d nnUNetTrainerV2 5 4</span><br><span class="line"></span><br><span class="line">nohup sh s2df4.sh &gt;2d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">s2df4</span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c --npz</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nohup sh s2df1.sh &gt;2d-fold1 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df2.sh &gt;2d-fold2 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df3.sh &gt;2d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df4.sh &gt;2d-fold4 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df5.sh &gt;2d-fold5 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nnUNet_find_best_configuration -m 2d -t 5 --strict</span><br><span class="line"></span><br><span class="line">nnUNet_predict -i /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw/nnUNet_raw_data/Task005_Tumour/imagesTs -o /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/res/2d -tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 2d -p nnUNetPlansv2.1 -t Task005_Tumour</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_predict -i /home/haitaowu/2021summer/final/nnUNetFrame/Res/ct_gz -o /home/haitaowu/2021summer/final/nnUNetFrame/Res/ctPredict -tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 2d -p nnUNetPlansv2.1 -t Task005_Tumour</span><br><span class="line"></span><br><span class="line">nohup sh s3dLowf1.sh &gt;fold1 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nohup sh s3df1.sh &gt;3d-fold1 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df2.sh &gt;3d-fold2 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df3.sh &gt;3d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df4.sh &gt;3d-fold4 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df5.sh &gt;3d-fold5 2&gt;&amp;1 &amp;</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_train 3d_fullres nnUNetTrainerV2 5 2 -c --npz</span><br></pre></td></tr></tbody></table></figure>
+
+<p>008.nii.gz 不行</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">##2D</span><br><span class="line">RuntimeError: MultiThreadedAugmenter.abort_event was set, something went wrong. Maybe one of your workers crashed. This is not the actual error message! Look further up your stdout to see what caused the error. Please also check whether your RAM was full</span><br><span class="line">需要加上参数--ipc=host</span><br><span class="line">pytorch 1.6.0 py3.8_cuda10.1.243_cudnn7.6.3_0 pytorch</span><br><span class="line">conda install pytorch==1.8.0 torchvision==0.9.0 torchaudio==0.8.0 cudatoolkit=10.2 -c pytorch</span><br><span class="line"></span><br><span class="line">##3D full resolution U-Net</span><br><span class="line">nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line">nnUNet_train 2d nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nohup nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c &amp;</span><br><span class="line">返回shell</span><br><span class="line">输入exit退出终端</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=0 nnUNet_train 3d_lowres nnUNetTrainerV2 5 4 --npz</span><br><span class="line"></span><br><span class="line">nnUNet_train 3d_lowres nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line">nnUNet_find_best_configuration -m 3d_fullres  -t 5 --strict</span><br><span class="line"></span><br><span class="line">nnUNet_find_best_configuration -m 2d 3d_fullres 3d_lowres 3d_cascade_fullres -t XXX --strict</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=6 nnUNet_predict -i /home/haitaowu/2021summer/final/nnUNetFrame/Res/ct -o /home/haitaowu/2021summer/final/nnUNetFrame/Res/tmp2 -tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 2d -p nnUNetPlansv2.1 -t Task005_Tumour --save_npz</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=0 nnUNet_predict \</span><br><span class="line">-i /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw/nnUNet_raw_data/Task005_Tumour/imagesTs \</span><br><span class="line">-o /home/haitaowu/2021summer/final/nnUNetFrame/Res/tmp \</span><br><span class="line">-tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 3d_fullres -p nnUNetPlansv2.1 -t Task005_Tumour --save_npz</span><br><span class="line"></span><br><span class="line">nnUNet_ensemble -f OUTPUT_DIRECTORY_3D OUTPUT_DIRECTORY_2D -o OUTPUT_FOLDER_ENSEMBLE -pp POSTPROCESSING_FILE</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>比赛运行命令</p>
+<p>1.</p>
+<p>2.</p>
+</li>
+<li><p>?</p>
+</li>
+</ol>
+</body></html>]]></content>
+  </entry>
+  <entry>
+    <title>minecraft-server-client</title>
+    <url>/2021/08/24/minecraft/</url>
+    <content><![CDATA[<html><head></head><body><p>Server端：</p>
+<ol>
+<li><p>docker  image</p>
+<p>获取镜像</p>
+<p>docker pull ubuntu:18.04</p>
+</li>
+<li><p>下载服务器包server.jar</p>
+</li>
+</ol>
+<ol start="3">
+<li><p>下载jdk，配置jdk环境</p>
+</li>
+<li><p>启动mc服务器</p>
+</li>
+</ol>
+<p>Client端：</p>
+<ol>
+<li><p>java环境</p>
+<p>java 16.0.2</p>
+</li>
+<li><p>启动端下载与配置</p>
+<p>HMCL</p>
+<p>配置本体目录，java目录 16.0.2</p>
+</li>
+<li><p>游戏本体下载</p>
+</li>
+</ol>
+</body></html>]]></content>
+  </entry>
+  <entry>
+    <title>preprocess--nunet</title>
+    <url>/2021/08/27/preprocess-nunet/</url>
+    <content><![CDATA[<html><head></head><body><p><a href="https://zhuanlan.zhihu.com/p/335970913">https://zhuanlan.zhihu.com/p/335970913</a></p>
+<p>Leaky ReLU</p>
+<p>对于ReLU, 当输入为负值的时候，ReLU 的学习速度可能会变得很慢，甚至使神经元直接无效，因为此时输入小于零而梯度为零，从而其权重无法得到更新，在剩下的训练过程中会一直保持静默。</p>
+<p>instanceNorm在图像像素上，对HW做归一化，与batch size无关；</p>
+<p>IN在计算归一化统计量时并没有像BN那样跨样本、单通道，也没有像LN那样单样本、跨通道。它是取的单通道，单样本上的数据进行计算</p>
+<p>图像裁剪Crop</p>
+<p>图像裁剪就是将三维的医学图像裁剪到它的非零区域，具体方法就是在图像中寻找一个最小的三维bounding box，该bounding box区域以外的值为0，使用这个bounding box对图像进行裁剪。相比裁剪前，裁剪后的图像对于最后的分割结果没有影响，但是却可以减小图像尺寸，避免无用的计算，提高计算效率。有效解决外围全黑背景相对较多的问题，</p>
+<img src="/2021/08/27/preprocess-nunet/003-23.png" alt="003-23" style="zoom:25%;">
+
+<p>裁剪可以分为以下3步：</p>
+<p>第一步根据三维图像数据data(C,X,Y)生成三维的非零模板nonzero_mask，标示图像中哪些区域是非零的 。调用scipy库的binary_fill_holes函数对生成的nonzero_mask进行填充。</p>
+<p>第二步根据生成的非零模板，确定用于裁剪的bounding_box大小和位置，在代码中就是要找到nonzero_mask在x，y，z三个坐标轴上值为1的最小坐标值以及最大坐标值。</p>
+<p>第三步就根据bounding_box对图像依次进行裁剪，然后重新组合在一起。</p>
+<p>注：在对原始数据裁剪完毕之后，使用同样的bounding box对分割标注seg进行裁剪，</p>
+<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">#按照spacing 进行 标准正态化</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_do_separate_z</span>(<span class="params">spacing, anisotropy_threshold=RESAMPLING_SEPARATE_Z_ANISO_THRESHOLD</span>):</span></span><br><span class="line">    do_separate_z = (np.<span class="built_in">max</span>(spacing) / np.<span class="built_in">min</span>(spacing)) &gt; anisotropy_threshold</span><br><span class="line">    <span class="keyword">return</span> do_separate_z</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+
+
+
+
+<p>重采样</p>
+<p>数据集中存在不同spacing的数据，默认自动归一化到数据集所有数据spacing的中值spacing。原始数据使用三阶spline插值；Mask使用最邻近插值。</p>
+<p>目的是解决在一些三维医学图像数据集中，不同的图像中单个体素voxel所代表的实际空间大小spacing不一致的问题。因为卷积神经网络只在体素空间中进行操作，会忽视掉实际物理空间中大小信息。为了避免这种差异性，需要对不同图像数据在体素空间进行resize，保证不同的图像数据中，每个体素所代表的实际物理空间一致。</p>
+<p>具体需要将整个数据集resample到多大的spacing，即目标空间大小target_spacing应该多大呢？nnUNet给出的建议是在大多数时候使用数据集各个图像不同spacing的中值，但是在各向异性（最大坐标上的spacing÷最小坐标上的spacing&gt;3）的数据集中，取数据集10%分位点的spacing值作为spacing最大坐标的目标空间大小会是更好的选择。重采样的步骤可以简单分成3步。</p>
+<p>第一步是确定重采样的目标空间大小。在之前数据格式转换的时候，每个数据的spacing信息存储在对应的pickle文件中，需要依次进行读取，然后一起存放在一个列表spacings当中。之后调用numpy中函数统计每个维度spacing的中值即可。</p>
+<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">#重采样Resample</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>而非CT图像的normalization相对简单一些，只需1步，每张三维图像只利用自身均值和标准差进行z-scoring即可。</p>
+<p>CT图像的normalization</p>
+<p>第一步是收集整个CT影像训练集前景的统计信息。data代表CT图像的三维数据。seg是存放分割标注信息的三维数组，根据crop步骤中的处理, 标注值为-1代表0值背景,标注值为0代表非0值的背景，而大于0代表不同的前景标签。nnUNet为了简便计算，对每张图像仅采样1/10的前景体素用于统计，存储在voxels列表中。通过对训练集中每张训练数据的遍历，将采样到的前景体素列表voxels拼接在一块，即voxels_all</p>
+<p>第二步调用numpy中的函数统计整个训练集前景的均值，标准差，0.5%分位HU值，99.5%分位HU值，并利用这些统计信息对每张图像进行clip以及z-scoring。代码中用use_nonzero_mask指示是否只在nonzero区域进行normalization</p>
+</body></html>]]></content>
+      <tags>
+        <tag>nnunet</tag>
+        <tag>preprocess</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>pycrypto的安装</title>
+    <url>/2021/08/14/pycrypto%E5%AE%89%E8%A3%85/</url>
+    <content><![CDATA[<html><head></head><body><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">pip install pycrypto</span><br></pre></td></tr></tbody></table></figure>
+
+</body></html>]]></content>
+      <categories>
+        <category>Diary</category>
+      </categories>
+      <tags>
+        <tag>pycrypto</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>python 自动生成代码工具</title>
+    <url>/2021/08/20/python-auto-coding/</url>
+    <content><![CDATA[<html><head></head><body></body></html>]]></content>
+      <tags>
+        <tag>python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>python自动化生成报告</title>
+    <url>/2021/08/20/python-auto-docx/</url>
+    <content><![CDATA[<html><head></head><body><ol>
+<li><p>引入相关库文件</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">import docx </span><br><span class="line">import os</span><br><span class="line">from PIL import Image</span><br><span class="line">from datetime import datetime</span><br><span class="line">from datetime import timedelta</span><br><span class="line">from datetime import timezone</span><br><span class="line">from docx.enum.text import WD_ALIGN_PARAGRAPH</span><br><span class="line">from docx.enum.text import WD_PARAGRAPH_ALIGNMENT</span><br><span class="line">from easydict import EasyDict  </span><br><span class="line">import re</span><br><span class="line">import pandas as pd</span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>文档信息</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#打开demo.docx文档，返回一个Document对象，它有paragraphs属性，是Paragraph对象的列表。</span><br><span class="line">doc = docx.Document()</span><br><span class="line">header = doc.sections[0].header</span><br><span class="line">paragraph = header.paragraphs[0]</span><br><span class="line">paragraph.add_run('Dylan@www.example.com')</span><br><span class="line">paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER</span><br><span class="line"></span><br><span class="line">paraObj0=doc.add_paragraph('文档生成','Title')</span><br><span class="line">paraObj0.alignment=WD_ALIGN_PARAGRAPH.CENTER</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">resTime='2021-8-20'</span><br><span class="line">paraObj1=doc.add_paragraph('python')</span><br><span class="line">paraObj1.alignment=WD_ALIGN_PARAGRAPH.CENTER</span><br><span class="line"></span><br><span class="line">paraObj2=doc.add_paragraph(resTime)</span><br><span class="line">paraObj2.alignment=WD_ALIGN_PARAGRAPH.CENTER</span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>表格</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">df = pd.read_excel('./web.xlsx')</span><br><span class="line">print('web imgs number is',len(df.index.values))</span><br><span class="line">table = doc.add_table(rows=1, cols=3,style='Table Grid')</span><br><span class="line">hdr_cells = table.rows[0].cells</span><br><span class="line">hdr_cells[0].text = '图片名称'</span><br><span class="line">hdr_cells[1].text = '危险程度'</span><br><span class="line">hdr_cells[2].text = '置信度'</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">row_cells = table.add_row().cells</span><br><span class="line">row_cells[0].text = str(pic_name)</span><br><span class="line">row_cells[1].text = conf.dangeStr[danger]</span><br><span class="line">row_cells[2].text = str(confident)</span><br></pre></td></tr></tbody></table></figure></li>
+</ol>
+<p><a href="Getdocx.py" title="源码下载">点击下载完整代码</a></p>
+</body></html>]]></content>
+      <tags>
+        <tag>python</tag>
+        <tag>auto</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>python compiler——基于python的python编译器</title>
+    <url>/2021/08/20/python-compiler/</url>
+    <content><![CDATA[<html><head></head><body></body></html>]]></content>
+  </entry>
+  <entry>
+    <title>python log</title>
+    <url>/2021/08/29/python-log/</url>
+    <content><![CDATA[<html><head></head><body><figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment"># DEBUG &lt; INFO &lt; WARN &lt; ERROR &lt; FATAL</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line">logging.basicConfig(<span class="built_in">format</span>=<span class="string">'%(asctime)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s'</span>,</span><br><span class="line">level=logging.INFO, filemode=<span class="string">'w'</span>, filename=<span class="string">'./log/log.txt'</span>)</span><br><span class="line"><span class="comment"># w 覆盖重写 ，a追加</span></span><br><span class="line">logging.error(<span class="string">"这是一条error信息的打印"</span>)</span><br><span class="line">logging.info(<span class="string">"这是一条info信息的打印"</span>)</span><br><span class="line">logging.warning(<span class="string">"这是一条warn信息的打印"</span>)</span><br><span class="line">logging.debug(<span class="string">"这是一条debug信息的打印"</span>)</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+</body></html>]]></content>
+      <tags>
+        <tag>python</tag>
+        <tag>log</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>screen</title>
+    <url>/2021/08/26/screen/</url>
+    <content><![CDATA[<html><head></head><body><h1 id="Linux将screen屏幕标准输出输出到日志中"><a href="#Linux将screen屏幕标准输出输出到日志中" class="headerlink" title="Linux将screen屏幕标准输出输出到日志中"></a>Linux将screen屏幕标准输出输出到日志中</h1><p>创建终端</p>
+<figure class="highlight shell"><table><tbody><tr><td class="code"><pre><span class="line">screen -S NAME</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<p>连接终端</p>
+<figure class="highlight shell"><table><tbody><tr><td class="code"><pre><span class="line">screen -R NAME</span><br></pre></td></tr></tbody></table></figure>
+
+</body></html>]]></content>
+  </entry>
+  <entry>
+    <title>server connect</title>
+    <url>/2021/08/22/server-connect/</url>
+    <content><![CDATA[<html><head></head><body><p>ssh -R 反向代理 选择端口</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">netstat -anp|grep :2000</span><br><span class="line">netstat -tunlp | grep 2000</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">ssh  -R 2000 user@xxx.xx.x.xx -p xxxx</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+</body></html>]]></content>
+  </entry>
+  <entry>
+    <title>Hexo Use SSH</title>
+    <url>/2021/08/12/startSSH/</url>
+    <content><![CDATA[<html><head></head><body><ol>
+<li> 设置本机rsa，并将rsa.pub添加到github设置中</li>
+<li>将config.yml 中 deploy中的repo从https改为<a href="mailto:git@github.com">git@github.com</a>:Dylan-get/Dylan-get.github.io.git，即可使用ssh，只需要输入本机访问rsa的密码</li>
+</ol>
+</body></html>]]></content>
+      <categories>
+        <category>Diary</category>
+      </categories>
+      <tags>
+        <tag>Hexo</tag>
+        <tag>SSH</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Streamlit</title>
+    <url>/2021/08/14/streamlit/</url>
+    <content><![CDATA[<html><head></head><body><p><img src="/2021/08/14/streamlit/streamlit_hello.png" alt="你想输入的替代文字"></p>
+<ol>
+<li><p>环境配置</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">pip install streamlit</span><br></pre></td></tr></tbody></table></figure>
+
+<p>运行尝试：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">streamlit hello</span><br></pre></td></tr></tbody></table></figure>
+
+<p>出现该页面，成功</p>
+<p><img src="/2021/08/14/streamlit/image-20210830080115632.png" alt="image-20210830080115632"></p>
+</li>
+<li><p>原理</p>
+<p>总而言之，Streamlit是这样工作的：</p>
+<ol>
+<li><p>为每个用户交互从头开始运行整个脚本。</p>
+</li>
+<li><p>Streamlit为每个变量配置指定微件状态的最新值。</p>
+</li>
+<li><p>缓存允许Streamlit跳过冗余的数据提取和计算步骤。</p>
+</li>
+</ol>
+</li>
+<li><p>ui</p>
+<p>运行</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">streamlit run your_script.py [-- script args]</span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>d</p>
+</li>
+</ol>
+</body></html>]]></content>
+      <tags>
+        <tag>Streamlit</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>docker</title>
+    <url>/2021/08/31/docker/</url>
+    <content><![CDATA[<html><head></head><body><p>简介：<a href="https://www.docker.com/">docker</a>是一个开源的应用容器引擎，让开发者可以打包他们的应用以及依赖包到一个可移植的镜像中。</p>
+<h1 id="1-安装docker"><a href="#1-安装docker" class="headerlink" title="1.安装docker"></a>1.安装docker</h1><p><a href="https://docs.docker.com/desktop/mac/apple-silicon/">m1 docker</a>下载</p>
+<h1 id="2-docker-pull-image"><a href="#2-docker-pull-image" class="headerlink" title="2.docker pull image"></a>2.docker pull image</h1><p><a href="https://www.jianshu.com/p/f0c6302e869e">https://www.jianshu.com/p/f0c6302e869e</a></p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">docker pull docker/getting-started</span><br><span class="line">docker pull ubuntu:18.04</span><br><span class="line">docker pull ubuntu@sha256:xxxx</span><br><span class="line">docker pull neo4j --platform amd64 <span class="comment">#https://blog.csdn.net/GodDavide/article/details/102636014</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="3-docker-run"><a href="#3-docker-run" class="headerlink" title="3.docker run"></a>3.docker run</h1><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">docker run -d -p 80:80 docker/getting-started</span><br><span class="line"></span><br><span class="line">docker run -itd -p 7474:7474 -p 7687:7687 --name=kg1 9c660  /bin/bash</span><br><span class="line"><span class="comment">#http://localhost:7474/browser/</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">docker run [OPTIONS] IMAGE [COMMAND] [ARG...]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>docker run 命令 从image 运行container</p>
+<ul>
+<li><strong>-d:</strong> 后台运行容器，并返回容器ID；</li>
+<li><strong>-i:</strong> 以交互模式运行容器，通常与 -t 同时使用；</li>
+<li><strong>-t:</strong> 为容器重新分配一个伪输入终端，通常与 -i 同时使用；</li>
+<li><strong>-p:</strong> 指定端口映射，格式为：<strong>主机(宿主)端口:容器端口</strong></li>
+</ul>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">docker run -it IMAGEID /bin/bash</span><br></pre></td></tr></tbody></table></figure>
+
+<p>使用镜像IMAGEID，以交互模式启动一个容器,在容器内执行/bin/bash命令。退出终端即关闭container</p>
+<p>若要后台运行：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">docker run -itd --name=NAME IMAGEID  /bin/bash</span><br></pre></td></tr></tbody></table></figure>
+
+<p>加了 <strong>-d</strong> 参数默认不会进入容器，想要进入容器需要使用指令 <strong>docker exec</strong>（下面会介绍到）。</p>
+<h2 id="进入容器"><a href="#进入容器" class="headerlink" title="进入容器"></a>进入容器</h2><ul>
+<li><strong>docker attach</strong></li>
+<li><strong>docker exec</strong>：推荐大家使用 docker exec 命令，因为此退出容器终端，不会导致容器的停止</li>
+</ul>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">docker attach 1e560fca3906 </span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it 243c32535da7 /bin/bash</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="4-docker-start"><a href="#4-docker-start" class="headerlink" title="4.docker start"></a>4.docker start</h1><p>开启container</p>
+<h1 id="5-docker-stop"><a href="#5-docker-stop" class="headerlink" title="5.docker stop"></a>5.docker stop</h1><p>停止container</p>
+<h1 id="6-docker-restart"><a href="#6-docker-restart" class="headerlink" title="6.docker restart"></a>6.docker restart</h1><h2 id="7-docker-load"><a href="#7-docker-load" class="headerlink" title="7.docker load"></a>7.docker load</h2><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">docker load -i path</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h2 id="8-docker-commit"><a href="#8-docker-commit" class="headerlink" title="8.docker commit"></a>8.docker commit</h2><figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">docker commit -a "wht" -m "dangshi" 5389  neo4j:dangshi</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<p>9.报错</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">netsh winsock reset</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+
+
+</body></html>]]></content>
+  </entry>
+  <entry>
+    <title>KG-EXAM</title>
+    <url>/2021/09/01/KG-EXAM/</url>
+    <content><![CDATA[<html><head></head><body><p>1.下载jdk</p>
+</body></html>]]></content>
+  </entry>
+  <entry>
+    <title>git</title>
+    <url>/2021/09/04/git/</url>
+    <content><![CDATA[<html><head></head><body><ol>
+<li><p>git init</p>
+</li>
+<li><p>git add </p>
+</li>
+<li><p>git commit </p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git commit -m "first commit"</span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>git branch</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git branch -M main</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>git branch 查看本地所有分支</li>
+<li>git branch -r查看远程所有分支</li>
+<li>git branch -a查看本地和远程所有分支</li>
+</ul>
+</li>
+<li><p>git remote add </p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git remote add origin git@gitee.com:wuhaitao_coding/ttest.git</span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>git push</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git push origin master</span><br><span class="line">git push -u origin master #加了参数-u后，以后即可直接用git push 代替git push origin master</span><br></pre></td></tr></tbody></table></figure></li>
+<li><p>git alias</p>
+</li>
+<li></li>
+</ol>
+<p>大家一定要养成在项目开始就创建.gitignore文件的习惯，否则一旦push，处理起来会非常麻烦</p>
+<p>有时候在项目开发过程中，突然心血来潮想把某些目录或文件加入忽略规则，按照上述方法定义后发现并未生效，原因是.gitignore只能忽略那些原来没有被track的文件，如果某些文件已经被纳入了版本管理中，则修改.gitignore是无效的。那么解决方法就是先把本地缓存删除（改变成未track状态），然后再提交：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git rm -r --cached .</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line">git commit -m 'update .gitignore'</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#git fatal: 远程 origin 已经存在 </span><br><span class="line">#重新添加远程</span><br><span class="line">git remote -v  </span><br><span class="line">git remote rm origin</span><br><span class="line"></span><br><span class="line">git remote add origin git@gitee.com:wuhaitao_coding/knowledge-graph.git</span><br><span class="line">username填写gitee户名，我这里是：fortunamajor</span><br><span class="line">um.git 填写仓库名.git</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+
+
+<p>git remote rm origin</p>
+</body></html>]]></content>
+      <tags>
+        <tag>-git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>xml-yml解析</title>
+    <url>/2021/09/03/xml-yaml%E8%A7%A3%E6%9E%90/</url>
+    <content><![CDATA[<html><head></head><body><p>xml</p>
+<p>可扩展标记语言 (Extensible Markup Language, XML) ，用于标记电子文件使其具有结构性的标记语言，可以用来标记数据、定义数据类型，是一种允许用户对自己的标记语言进行定义的源语言。 XML是标准通用标记语言 (SGML) 的子集，非常适合 Web 传输。XML 提供统一的方法来描述和交换独立于应用程序或供应商的结构化数据。</p>
+<ul>
+<li>YAML易于人们阅读。</li>
+<li>YAML数据在编程语言之间是可移植的。</li>
+<li>YAML匹配敏捷语言的本机数据结构。</li>
+<li>YAML具有一致的模型来支持通用工具。</li>
+<li>YAML支持单程处理。</li>
+<li>YAML具有表现力和可扩展性。</li>
+<li>YAML易于实现和使用。</li>
+</ul>
+<p>yaml</p>
+<p>YAML 作为一种比 XML 更为简单易读的序列化语言，正越来越多地被用于应用及配置文件的开发中。</p>
+<figure class="highlight yaml"><table><tbody><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="attr">k:</span> <span class="string">v</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#字符串</span></span><br><span class="line"><span class="string">字符串默认不用加上单引号或者双绰号；</span></span><br><span class="line"><span class="string">''</span><span class="string">：单引号；会转义特殊字符，特殊字符最终只是一个普通的字符串数据</span></span><br><span class="line"><span class="string">""</span><span class="string">:</span> <span class="string">双引号；不会转义字符串里面的特殊字符；特殊字符会作为本身想表示的意思</span></span><br><span class="line"></span><br><span class="line"><span class="attr">name:</span> <span class="string">"zhangsan \n lisi"</span><span class="string">：</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#日期</span></span><br><span class="line"><span class="attr">date:</span> <span class="number">2019</span><span class="string">/01/01</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#对象：属、性值	</span></span><br><span class="line"><span class="comment">#多行</span></span><br><span class="line"><span class="attr">people:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">zhangsan</span></span><br><span class="line">    <span class="attr">age:</span> <span class="number">20</span>   </span><br><span class="line"><span class="comment">#单行</span></span><br><span class="line"><span class="attr">people:</span> {<span class="string">name:zhangsan</span>,<span class="attr">age:</span> <span class="number">20</span>}</span><br><span class="line"></span><br><span class="line"><span class="comment">#数组、list、set</span></span><br><span class="line"><span class="attr">pets:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">dog</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">pig</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">cat</span></span><br><span class="line"><span class="comment">#单行</span></span><br><span class="line"><span class="attr">pets:</span> [<span class="string">dog</span>,<span class="string">pig</span>,<span class="string">cat</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#数组对象、list对象、set对象</span></span><br><span class="line"><span class="attr">peoples:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">zhangsan</span></span><br><span class="line">      <span class="attr">age:</span> <span class="number">22</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">lisi</span></span><br><span class="line">      <span class="attr">age:</span> <span class="number">20</span></span><br><span class="line">    <span class="bullet">-</span> {<span class="attr">name:</span> <span class="string">wangwu</span>,<span class="attr">age:</span> <span class="number">18</span>}</span><br><span class="line">    </span><br><span class="line"><span class="comment">#文档块</span></span><br><span class="line"><span class="comment">#对于测试环境，预生产环境，生产环境可以使用不同的配置，如果只想写到一个文件中，yml与是支持的,每个块用----隔开</span></span><br><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8081</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span></span><br><span class="line">    <span class="attr">active:</span> <span class="string">prod</span> <span class="comment">#激活对应的文档块</span></span><br><span class="line"></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8083</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span> <span class="string">dev</span> <span class="comment">#指定属于哪个环境</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8084</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span> <span class="string">prod</span>  <span class="comment">#指定属于哪个环境</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+
+
+
+<p>语法</p>
+<ul>
+<li>k: v 表示键值对关系，冒号后面必须有一个空格</li>
+<li>使用空格的缩进表示层级关系，空格数目不重要，只要是左对齐的一列数据，都是同一个层级的</li>
+<li>大小写敏感</li>
+<li>缩进时不允许使用Tab键，只允许使用空格。</li>
+<li>松散表示，java中对于驼峰命名法，可用原名或使用-代替驼峰，如java中的lastName属性,在yml中使用lastName或 last-name都可正确映射。</li>
+</ul>
+<h4 id=""><a href="#" class="headerlink" title=""></a></h4></body></html>]]></content>
   </entry>
   <entry>
     <title>ML-lab3 图像分类</title>
@@ -179,460 +765,6 @@
 </body></html>]]></content>
   </entry>
   <entry>
-    <title>PCA</title>
-    <url>/2021/08/30/PCA/</url>
-    <content><![CDATA[<html><head></head><body><h1 id="原理："><a href="#原理：" class="headerlink" title="原理："></a>原理：</h1><p>PCA(Principal Component Analysis)，即主成分分析方法，是一种使用最广泛的数据降维算法。PCA的主要思想是将n维特征映射到k维上，这k维是全新的正交特征也被称为主成分，是在原有n维特征的基础上重新构造出来的k维特征。PCA的工作就是从原始的空间中顺序地找一组相互正交的坐标轴，新的坐标轴的选择与数据本身是密切相关的。其中，第一个新坐标轴选择是原始数据中方差最大的方向，第二个新坐标轴选取是与第一个坐标轴正交的平面中使得方差最大的，第三个轴是与第1,2个轴正交的平面中方差最大的。依次类推，可以得到n个这样的坐标轴。通过这种方式获得的新的坐标轴，我们发现，大部分方差都包含在前面k个坐标轴中，后面的坐标轴所含的方差几乎为0。于是，我们可以忽略余下的坐标轴，只保留前面k个含有绝大部分方差的坐标轴。事实上，这相当于只保留包含绝大部分方差的维度特征，而忽略包含方差几乎为0的特征维度，实现对数据特征的降维处理。</p>
-<h1 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h1><h2 id="sklearn官方："><a href="#sklearn官方：" class="headerlink" title="sklearn官方："></a>sklearn官方：</h2><p>n_components:  </p>
-<p>意义：PCA算法中所要保留的主成分个数n，也即保留下来的特征个数n</p>
-<p>类型：int 或者 string，缺省时默认为None，所有成分被保留。</p>
-<pre><code>      赋值为int，比如n_components=1，将把原始数据降到一个维度。
-
-      赋值为string，比如n_components='mle'，将自动选取特征个数n，使得满足所要求的方差百分比。
-</code></pre>
-<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sklearnPCA</span>(<span class="params">n_components=<span class="number">36</span></span>):</span></span><br><span class="line">    <span class="comment"># count=int(math.sqrt(n_components))</span></span><br><span class="line">    count=<span class="number">6</span></span><br><span class="line">    </span><br><span class="line">    data=getData()</span><br><span class="line">    pca = PCA(n_components=n_components)</span><br><span class="line">    pca.fit(data)</span><br><span class="line">    components=pca.components_</span><br><span class="line">    <span class="built_in">print</span>(components.shape)</span><br><span class="line">    tmpArray=np.zeros((<span class="number">32</span>*count,<span class="number">32</span>*count))</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">36</span>):</span><br><span class="line">        <span class="built_in">print</span>(i)</span><br><span class="line">        row=<span class="built_in">int</span>(i/count)</span><br><span class="line">        col=i%count</span><br><span class="line">        tmpArray[row*<span class="number">32</span>:row*<span class="number">32</span>+<span class="number">32</span>,col*<span class="number">32</span>:col*<span class="number">32</span>+<span class="number">32</span>]=components[i].reshape(<span class="number">32</span>,<span class="number">32</span>)</span><br><span class="line">    </span><br><span class="line">    tmpArray=(tmpArray*<span class="number">255</span>).astype(<span class="string">'uint8'</span>)</span><br><span class="line">    <span class="built_in">print</span>(tmpArray.shape)</span><br><span class="line">    image=Image.fromarray(tmpArray,mode=<span class="string">'L'</span>)</span><br><span class="line">    </span><br><span class="line">    image.save(<span class="string">'./res/sklearn-norm1-n40.png'</span>)</span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<h2 id="手写PCA"><a href="#手写PCA" class="headerlink" title="手写PCA:"></a>手写PCA:</h2><figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">myPCA</span>():</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self,data,n_components</span>):</span></span><br><span class="line">        self.data=data</span><br><span class="line">        self.dim=data.shape[<span class="number">0</span>]</span><br><span class="line">        self.n_components=n_components</span><br><span class="line">        <span class="keyword">if</span> self.n_components&gt;self.data.shape[<span class="number">0</span>]:</span><br><span class="line">            <span class="keyword">raise</span> ValueError(<span class="string">"n_components error , too large"</span>)</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cov</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment">#求x的协方差矩阵</span></span><br><span class="line">        x_T = np.transpose(self.data)                           </span><br><span class="line">        x_cov = np.cov(x_T)                                 </span><br><span class="line">        <span class="keyword">return</span> x_cov</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_feature</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment">#求协方差矩阵C的特征值和特征向量</span></span><br><span class="line">        x_cov = self.cov()</span><br><span class="line">        a, b = np.linalg.eig(x_cov)</span><br><span class="line">        m = a.shape[<span class="number">0</span>] <span class="comment">#特征值个数</span></span><br><span class="line">        c = np.hstack((a.reshape((m,<span class="number">1</span>)), b))</span><br><span class="line">        c_df = pd.DataFrame(c)</span><br><span class="line">        c_df_sort = c_df.sort_values(by=<span class="number">0</span>,axis=<span class="number">0</span>, ascending=<span class="literal">False</span>)    </span><br><span class="line">        <span class="keyword">return</span> c_df_sort</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">explained_varience_</span>(<span class="params">self</span>):</span></span><br><span class="line">        c_df_sort=self.get_feature()</span><br><span class="line">        <span class="keyword">return</span> c_df_sort.values[:,<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">reduce_dimension</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment">#指定维度降维和根据方差降维</span></span><br><span class="line">        c_df_sort = self.get_feature()</span><br><span class="line">        varience = self.explained_varience_()</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">if</span> self.n_components:                                <span class="comment">#指定降维维度</span></span><br><span class="line">            p = c_df_sort.values[<span class="number">0</span>:self.n_components, <span class="number">1</span>:]</span><br><span class="line">            y = np.dot(p, np.transpose(self.data))              </span><br><span class="line">            <span class="keyword">return</span> np.transpose(y)</span><br><span class="line"> </span><br><span class="line">        varience_sum = <span class="built_in">sum</span>(varience)                         </span><br><span class="line">        varience_radio = varience / varience_sum</span><br><span class="line"> </span><br><span class="line">        varience_contribution = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> R <span class="keyword">in</span> <span class="built_in">range</span>(self.dimension):</span><br><span class="line">            varience_contribution += varience_radio[R]       </span><br><span class="line">            <span class="keyword">if</span> varience_contribution &gt;= <span class="number">0.99</span>:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line"> </span><br><span class="line">        p = c_df_sort.values[<span class="number">0</span>:R+<span class="number">1</span>, <span class="number">1</span>:]                      <span class="comment">#取前R个特征向量</span></span><br><span class="line">        y = np.dot(p, np.transpose(self.x))                  </span><br><span class="line">        <span class="keyword">return</span> np.transpose(y)</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-
-
-
-
-<h1 id="可视化效果："><a href="#可视化效果：" class="headerlink" title="可视化效果："></a>可视化效果：</h1><h2 id="Sklearn-face"><a href="#Sklearn-face" class="headerlink" title="Sklearn-face"></a>Sklearn-face</h2><p><img src="/2021/08/30/PCA/sklearn-norm1-n16.png" alt="sklearn-norm1-n16"></p>
-<h3 id="Sklearn-2D"><a href="#Sklearn-2D" class="headerlink" title="Sklearn-2D:"></a>Sklearn-2D:</h3><p><img src="/2021/08/30/PCA/sklearn-2dV.png" alt="sklearn-2dV"></p>
-<h2 id="Sklearn-3D"><a href="#Sklearn-3D" class="headerlink" title="Sklearn-3D:"></a>Sklearn-3D:</h2><p><img src="/2021/08/30/PCA/sklearn-3dV.png" alt="sklearn-3dV"></p>
-<h2 id="手写-face"><a href="#手写-face" class="headerlink" title="手写-face"></a>手写-face</h2><p><img src="/2021/08/30/PCA/wht-norm1-n256.png" alt="wht-norm1-n256"></p>
-<h2 id="手写-2D："><a href="#手写-2D：" class="headerlink" title="手写-2D："></a>手写-2D：</h2><p><img src="/2021/08/30/PCA/wht-2dV.png" alt="wht-2dV"></p>
-<h2 id="手写-3D："><a href="#手写-3D：" class="headerlink" title="手写-3D："></a>手写-3D：</h2><p><img src="/2021/08/30/PCA/wht-3dV.png" alt="wht-3dV"></p>
-</body></html>]]></content>
-      <tags>
-        <tag>ML</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Paddle Seg的使用</title>
-    <url>/2021/08/16/Paddle-Seg/</url>
-    <content><![CDATA[<html><head></head><body><h3 id="1-安装paddlepaddle："><a href="#1-安装paddlepaddle：" class="headerlink" title="1.安装paddlepaddle："></a>1.安装paddlepaddle：</h3><p><a href="https://www.paddlepaddle.org.cn/">官网</a>找到符合的版本，安装即可</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">python -m pip install paddlepaddle-gpu==2.1.2.post101 -f https://www.paddlepaddle.org.cn/whl/linux/mkl/avx/stable.html</span><br><span class="line"></span><br><span class="line">或</span><br><span class="line"></span><br><span class="line">conda install paddlepaddle-gpu==2.1.2 cudatoolkit=10.1 --channel https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/Paddle/</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<h3 id="2-在github下载相应源码"><a href="#2-在github下载相应源码" class="headerlink" title="2.在github下载相应源码"></a>2.在github下载相应源码</h3><p><a href="https://github.com/PaddlePaddle/PaddleSeg">网址</a></p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/PaddlePaddle/PaddleSeg.git</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<h3 id="3-开始自己的项目"><a href="#3-开始自己的项目" class="headerlink" title="3.开始自己的项目"></a>3.开始自己的项目</h3><p><a href="https://github.com/PaddlePaddle/PaddleSeg/blob/release/2.2/docs/install_cn.md">官方参考文档</a></p>
-<h4 id="3-1创建自己的数据集合"><a href="#3-1创建自己的数据集合" class="headerlink" title="3.1创建自己的数据集合"></a>3.1创建自己的数据集合</h4><h4 id="3-2更改config设置，选择自己需要的模型和loss"><a href="#3-2更改config设置，选择自己需要的模型和loss" class="headerlink" title="3.2更改config设置，选择自己需要的模型和loss"></a>3.2更改config设置，选择自己需要的模型和loss</h4><h4 id="3-3训练与评估"><a href="#3-3训练与评估" class="headerlink" title="3.3训练与评估"></a>3.3训练与评估</h4></body></html>]]></content>
-      <tags>
-        <tag>Paddle Seg</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MY FIRST BLOG</title>
-    <url>/2021/08/12/blog/</url>
-    <content><![CDATA[<html><head></head><body><p>Welcome to My Blog(<a href="https://dylan-get.github.io/">https://dylan-get.github.io/</a>)! Store something insteresting here!</p>
-</body></html>]]></content>
-      <categories>
-        <category>Diary</category>
-      </categories>
-      <tags>
-        <tag>first</tag>
-        <tag>try</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>blog搭建-Hexo</title>
-    <url>/2021/08/13/blog%E6%90%AD%E5%BB%BA-hexo/</url>
-    <content><![CDATA[<html><head></head><body><p>Hexo 是一个基于<a href="http://www.oschina.net/p/nodejs">nodejs</a> 的静态博客网站生成器，作者是来自台湾的 <a href="http://mailto:tommy351@gmail.com/">Tommy Chen</a>，支持许多不同的theme来美化blog。</p>
-<h2 id="Blog搭建过程如下："><a href="#Blog搭建过程如下：" class="headerlink" title="Blog搭建过程如下："></a>Blog搭建过程如下：</h2><h3 id="1-配置基本运行环境"><a href="#1-配置基本运行环境" class="headerlink" title="1.配置基本运行环境"></a>1.配置基本运行环境</h3><h4 id="安装nvm："><a href="#安装nvm：" class="headerlink" title="安装nvm："></a>安装nvm：</h4><p>nvm（Node Version Manager）是一个开源的node.js多版本管理Bash工具，类似于Python中的pyenv工具，用于在Bash环境中随意切换已安装的node版本</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line"></span><br><span class="line">curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash</span><br><span class="line"></span><br><span class="line">or</span><br><span class="line"></span><br><span class="line">wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
-
-<h4 id="安装Node-js"><a href="#安装Node-js" class="headerlink" title="安装Node.js"></a>安装Node.js</h4><figure class="highlight shell"><table><tbody><tr><td class="code"><pre><span class="line">nvm install node</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<h4 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h4><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<h4 id="安装hexo-deployer-git"><a href="#安装hexo-deployer-git" class="headerlink" title="安装hexo-deployer-git"></a>安装hexo-deployer-git</h4><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="2-初识博客"><a href="#2-初识博客" class="headerlink" title="2.初识博客"></a>2.初识博客</h3><h4 id="初始化："><a href="#初始化：" class="headerlink" title="初始化："></a>初始化：</h4><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">hexo init</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<h4 id="生成静态网页："><a href="#生成静态网页：" class="headerlink" title="生成静态网页："></a>生成静态网页：</h4><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">hexo g</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<h4 id="启动服务器："><a href="#启动服务器：" class="headerlink" title="启动服务器："></a>启动服务器：</h4><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">hexo s</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-
-
-<h3 id="3-美化博客"><a href="#3-美化博客" class="headerlink" title="3.美化博客"></a>3.美化博客</h3><p>从hexo<a href="https://hexo.io/themes/">官方网址</a>选择喜欢的主题，并参考相关项目github中的指引，完成环境配置和主题设置，以butterfly为例：</p>
-<p>下载文件到 /themes/butterfly，并将blog项目根目录的_config.yml的主题更改为butterfly。</p>
-</body></html>]]></content>
-      <tags>
-        <tag>Hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>docker</title>
-    <url>/2021/08/31/docker/</url>
-    <content><![CDATA[<html><head></head><body><p>简介：<a href="https://www.docker.com/">docker</a>是一个开源的应用容器引擎，让开发者可以打包他们的应用以及依赖包到一个可移植的镜像中。</p>
-<h1 id="1-安装docker"><a href="#1-安装docker" class="headerlink" title="1.安装docker"></a>1.安装docker</h1><p><a href="https://docs.docker.com/desktop/mac/apple-silicon/">m1 docker</a>下载</p>
-<h1 id="2-docker-pull-image"><a href="#2-docker-pull-image" class="headerlink" title="2.docker pull image"></a>2.docker pull image</h1><p><a href="https://www.jianshu.com/p/f0c6302e869e">https://www.jianshu.com/p/f0c6302e869e</a></p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">docker pull docker/getting-started</span><br><span class="line">docker pull ubuntu:18.04</span><br><span class="line">docker pull ubuntu@sha256:xxxx</span><br><span class="line">docker pull neo4j --platform amd64 <span class="comment">#https://blog.csdn.net/GodDavide/article/details/102636014</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="3-docker-run"><a href="#3-docker-run" class="headerlink" title="3.docker run"></a>3.docker run</h1><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">docker run -d -p 80:80 docker/getting-started</span><br><span class="line"></span><br><span class="line">docker run -itd -p 7474:7474 -p 7687:7687 --name=kg1 9c660  /bin/bash</span><br><span class="line"><span class="comment">#http://localhost:7474/browser/</span></span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">docker run [OPTIONS] IMAGE [COMMAND] [ARG...]</span><br></pre></td></tr></tbody></table></figure>
-
-<p>docker run 命令 从image 运行container</p>
-<ul>
-<li><strong>-d:</strong> 后台运行容器，并返回容器ID；</li>
-<li><strong>-i:</strong> 以交互模式运行容器，通常与 -t 同时使用；</li>
-<li><strong>-t:</strong> 为容器重新分配一个伪输入终端，通常与 -i 同时使用；</li>
-<li><strong>-p:</strong> 指定端口映射，格式为：<strong>主机(宿主)端口:容器端口</strong></li>
-</ul>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">docker run -it IMAGEID /bin/bash</span><br></pre></td></tr></tbody></table></figure>
-
-<p>使用镜像IMAGEID，以交互模式启动一个容器,在容器内执行/bin/bash命令。退出终端即关闭container</p>
-<p>若要后台运行：</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">docker run -itd --name=NAME IMAGEID  /bin/bash</span><br></pre></td></tr></tbody></table></figure>
-
-<p>加了 <strong>-d</strong> 参数默认不会进入容器，想要进入容器需要使用指令 <strong>docker exec</strong>（下面会介绍到）。</p>
-<h2 id="进入容器"><a href="#进入容器" class="headerlink" title="进入容器"></a>进入容器</h2><ul>
-<li><strong>docker attach</strong></li>
-<li><strong>docker exec</strong>：推荐大家使用 docker exec 命令，因为此退出容器终端，不会导致容器的停止</li>
-</ul>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">docker attach 1e560fca3906 </span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it 243c32535da7 /bin/bash</span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="4-docker-start"><a href="#4-docker-start" class="headerlink" title="4.docker start"></a>4.docker start</h1><p>开启container</p>
-<h1 id="5-docker-stop"><a href="#5-docker-stop" class="headerlink" title="5.docker stop"></a>5.docker stop</h1><p>停止container</p>
-<h1 id="6-docker-restart"><a href="#6-docker-restart" class="headerlink" title="6.docker restart"></a>6.docker restart</h1><h2 id="7-docker-load"><a href="#7-docker-load" class="headerlink" title="7.docker load"></a>7.docker load</h2><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">docker load -i path</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<h2 id="8-docker-commit"><a href="#8-docker-commit" class="headerlink" title="8.docker commit"></a>8.docker commit</h2><figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">docker commit -a "wht" -m "dangshi" 5389  neo4j:dangshi</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<p>9.报错</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">netsh winsock reset</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-
-
-</body></html>]]></content>
-  </entry>
-  <entry>
-    <title>Hexo comment</title>
-    <url>/2021/08/18/hexo-comment/</url>
-    <content><![CDATA[<html><head></head><body><ol>
-<li><h4 id="找到主题配置文件的对应配置项目"><a href="#找到主题配置文件的对应配置项目" class="headerlink" title="找到主题配置文件的对应配置项目"></a>找到主题配置文件的对应配置项目</h4><img src="/2021/08/18/hexo-comment/comment_code.png" class="" title="配置">
-
-<p>创建 OAuth Application</p>
-<p><a href="https://github.com/settings/developers">https://github.com/settings/developers</a></p>
-<img src="/2021/08/18/hexo-comment/comment_createApp.png" class="">
-
-<p>1）Application name 可以随便填一个。</p>
-<p>2）Homepage URL 必须是博客仓库的域名（GitHub Pages ）</p>
-<p>3）Authorization callback URL 必须是博客的域名</p>
-<img src="/2021/08/18/hexo-comment/comment_createApp2.png" class=""></li>
-<li><h4 id="创建评论仓库"><a href="#创建评论仓库" class="headerlink" title="创建评论仓库"></a>创建评论仓库</h4></li>
-<li><h4 id="修改主题配置"><a href="#修改主题配置" class="headerlink" title="修改主题配置"></a>修改主题配置</h4></li>
-</ol>
-<figure class="highlight yaml"><table><tbody><tr><td class="code"><pre><span class="line"><span class="attr">comments:</span></span><br><span class="line">  <span class="comment"># Up to two comments system, the first will be shown as default</span></span><br><span class="line">  <span class="comment"># Choose: Disqus/Disqusjs/Livere/Gitalk/Valine/Waline/Utterances/Facebook Comments/Twikoo</span></span><br><span class="line">  <span class="attr">use:</span></span><br><span class="line">  <span class="comment"># - Valine</span></span><br><span class="line">  <span class="comment"># - Disqus</span></span><br><span class="line">  <span class="comment"># - Livere</span></span><br><span class="line">   <span class="bullet">-</span> <span class="string">Gitalk</span></span><br><span class="line">  <span class="attr">text:</span> <span class="literal">true</span> <span class="comment"># Display the comment name next to the button</span></span><br><span class="line">  <span class="comment"># lazyload: The comment system will be load when comment element enters the browser's viewport.</span></span><br><span class="line">  <span class="comment"># If you set it to true, the comment count will be invalid</span></span><br><span class="line">  <span class="attr">lazyload:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">count:</span> <span class="literal">true</span> <span class="comment"># Display comment count in post's top_img</span></span><br><span class="line">  <span class="attr">card_post_count:</span> <span class="literal">true</span> <span class="comment"># Display comment count in Home Page</span></span><br></pre></td></tr></tbody></table></figure>
-
-
-
-
-
-<figure class="highlight yaml"><table><tbody><tr><td class="code"><pre><span class="line"><span class="attr">gitalk:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">client_id:</span> <span class="string">xxxxxxxxxxxxxxx</span></span><br><span class="line">  <span class="attr">client_secret:</span> <span class="string">xxxxxxxxxxxxxxx</span></span><br><span class="line">  <span class="attr">repo:</span> <span class="string">blog-comment</span></span><br><span class="line">  <span class="attr">owner:</span> <span class="string">Dylan-get</span></span><br><span class="line">  <span class="attr">admin:</span> <span class="string">Dylan-get</span></span><br><span class="line">  <span class="attr">option:</span></span><br></pre></td></tr></tbody></table></figure>
-
-
-
-
-
-
-
-
-
-<h4 id="BUG1：Hexo集成Gittalk报Error-not-found："><a href="#BUG1：Hexo集成Gittalk报Error-not-found：" class="headerlink" title="BUG1：Hexo集成Gittalk报Error not found："></a>BUG1：Hexo集成Gittalk报Error not found：</h4><img src="/2021/08/18/hexo-comment/comment_bug1.png" class="" title="配置">
-
-<p><a href="http://zyjbml.cn/2019/12/20/gittalk-one/">参考网址</a></p>
-<p>解决方案：将评论仓库设置为公开</p>
-<h4 id="BUG2：未找到相关的-Issues-进行评论，请联系xxx初始化创建"><a href="#BUG2：未找到相关的-Issues-进行评论，请联系xxx初始化创建" class="headerlink" title="BUG2：未找到相关的 Issues 进行评论，请联系xxx初始化创建"></a>BUG2：未找到相关的 Issues 进行评论，请联系xxx初始化创建</h4><p><a href="https://blog.csdn.net/gaocongzhi/article/details/116567800?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_title~default-1.control&amp;spm=1001.2101.3001.4242">参考网址</a></p>
-<p>该评论仓库中的settings设置开启issue评论，初始化 issues。点击issues栏，create an issue。</p>
-<h3 id="效果："><a href="#效果：" class="headerlink" title="效果："></a>效果：</h3><img src="/2021/08/18/hexo-comment/comment.png" class="">
-</body></html>]]></content>
-      <tags>
-        <tag>Hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>git</title>
-    <url>/2021/09/04/git/</url>
-    <content><![CDATA[<html><head></head><body><ol>
-<li><p>git init</p>
-</li>
-<li><p>git add </p>
-</li>
-<li><p>git commit </p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git commit -m "first commit"</span><br></pre></td></tr></tbody></table></figure></li>
-<li><p>git branch</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git branch -M main</span><br></pre></td></tr></tbody></table></figure>
-
-<ul>
-<li>git branch 查看本地所有分支</li>
-<li>git branch -r查看远程所有分支</li>
-<li>git branch -a查看本地和远程所有分支</li>
-</ul>
-</li>
-<li><p>git remote add </p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git remote add origin git@gitee.com:wuhaitao_coding/ttest.git</span><br></pre></td></tr></tbody></table></figure></li>
-<li><p>git push</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git push origin master</span><br><span class="line">git push -u origin master #加了参数-u后，以后即可直接用git push 代替git push origin master</span><br></pre></td></tr></tbody></table></figure></li>
-<li><p>git alias</p>
-</li>
-<li></li>
-</ol>
-<p>大家一定要养成在项目开始就创建.gitignore文件的习惯，否则一旦push，处理起来会非常麻烦</p>
-<p>有时候在项目开发过程中，突然心血来潮想把某些目录或文件加入忽略规则，按照上述方法定义后发现并未生效，原因是.gitignore只能忽略那些原来没有被track的文件，如果某些文件已经被纳入了版本管理中，则修改.gitignore是无效的。那么解决方法就是先把本地缓存删除（改变成未track状态），然后再提交：</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git rm -r --cached .</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line">git commit -m 'update .gitignore'</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#git fatal: 远程 origin 已经存在 </span><br><span class="line">#重新添加远程</span><br><span class="line">git remote -v  </span><br><span class="line">git remote rm origin</span><br><span class="line"></span><br><span class="line">git remote add origin git@gitee.com:wuhaitao_coding/knowledge-graph.git</span><br><span class="line">username填写gitee户名，我这里是：fortunamajor</span><br><span class="line">um.git 填写仓库名.git</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-
-
-<p>git remote rm origin</p>
-</body></html>]]></content>
-      <tags>
-        <tag>-git</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>hexo images</title>
-    <url>/2021/08/18/hexo-images/</url>
-    <content><![CDATA[<html><head></head><body><h3 id="设置post-asset-folder-true"><a href="#设置post-asset-folder-true" class="headerlink" title="设置post_asset_folder: true"></a>设置post_asset_folder: <strong>true</strong></h3><img src="/2021/08/18/hexo-images/post_asset.png" class="" title="图片">
-
-<h3 id="工程目录下执行"><a href="#工程目录下执行" class="headerlink" title="工程目录下执行"></a>工程目录下执行</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">hexo new post <span class="string">'hexo images'</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>即在post文件夹下建立与md同名的文件夹</p>
-<h3 id="插入图片格式"><a href="#插入图片格式" class="headerlink" title="插入图片格式:"></a>插入图片格式:</h3><h4 id="格式1"><a href="#格式1" class="headerlink" title="格式1:"></a>格式1:</h4><figure class="highlight markdown"><table><tbody><tr><td class="code"><pre><span class="line">{% asset<span class="emphasis">_img streamlit_</span>hello.png 测试图片 %}</span><br></pre></td></tr></tbody></table></figure>
-
-<img src="/2021/08/18/hexo-images/streamlit_hello.png" class="" title="测试图片">
-
-<p>其中<em>测试图片</em>为title属性，当鼠标移动该图片位置显示该内容</p>
-<h4 id="格式2："><a href="#格式2：" class="headerlink" title="格式2："></a>格式2：</h4><figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">![404 not found](streamlit_hello.png)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>其中*[404 not found]*为其alt属性，在不能正常显示时显示的文字</p>
-<p><img src="/2021/08/18/hexo-images/streamlit_hello.png" alt="404 not found"></p>
-</body></html>]]></content>
-      <categories>
-        <category>Diary</category>
-      </categories>
-      <tags>
-        <tag>Hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>hexo live2d</title>
-    <url>/2021/08/18/hexo-live2d/</url>
-    <content><![CDATA[<html><head></head><body><p><a href="https://akilar.top/posts/5b8f515f/">参考网址</a></p>
-<ol>
-<li><p>以 <code>Butterfly</code> 主题为例，在 <code>[Blogroot]\themes\butterfly\source\</code> 目录下打开终端，输入</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/stevenjoezhang/live2d-widget.git live2d-widget</span><br></pre></td></tr></tbody></table></figure></li>
-<li><p>找到路径 <code>[Blogroot]\themes\butterfly\source\live2d-widget\autoload.js</code>，打开 <code>autoload.js</code>，修改内容：</p>
-<figure class="highlight diff"><table><tbody><tr><td class="code"><pre><span class="line"><span class="deletion">- const live2d_path = "https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget/";</span></span><br><span class="line"><span class="addition">+ const live2d_path = "/live2d-widget/";</span></span><br></pre></td></tr></tbody></table></figure></li>
-<li><p> 在 <code>Butterfly</code> 的主题配置文件 <code>[Blogroot]\themes\_config.yml</code> 中，<code>butterfly</code> 主题其实自带 <code>fontawesome</code> 依赖，只需引入</p>
-</li>
-</ol>
-   <figure class="highlight diff"><table><tbody><tr><td class="code"><pre><span class="line">    # Inject</span><br><span class="line">    # Insert the code to head (before '&lt;/head&gt;' tag) and the bottom (before '&lt;/body&gt;' tag)</span><br><span class="line">    # 插入代码到头部 &lt;/head&gt; 之前 和 底部 &lt;/body&gt; 之前</span><br><span class="line">    inject:</span><br><span class="line">      head:</span><br><span class="line">        # - &lt;link rel="stylesheet" href="/xxx.css"&gt;</span><br><span class="line">      bottom:</span><br><span class="line">        # - &lt;script src="xxxx"&gt;&lt;/script&gt;</span><br><span class="line"><span class="addition">+       - &lt;script defer src="/live2d-widget/autoload.js"&gt;&lt;/script&gt;</span></span><br></pre></td></tr></tbody></table></figure>
-</body></html>]]></content>
-      <tags>
-        <tag>Hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>hexo search</title>
-    <url>/2021/08/18/hexo-search/</url>
-    <content><![CDATA[<html><head></head><body><h3 id="1-安装-hexo-generator-searchdb，在站点的根目录下执行以下命令："><a href="#1-安装-hexo-generator-searchdb，在站点的根目录下执行以下命令：" class="headerlink" title="1.安装 hexo-generator-searchdb，在站点的根目录下执行以下命令："></a>1.安装 <code>hexo-generator-searchdb</code>，在站点的根目录下执行以下命令：</h3><figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">npm install hexo-generator-searchdb --save</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<h3 id="2-编辑主题配置文件，启用本地搜索功能："><a href="#2-编辑主题配置文件，启用本地搜索功能：" class="headerlink" title="2.编辑主题配置文件，启用本地搜索功能："></a>2.编辑主题配置文件，启用本地搜索功能：</h3><figure class="highlight yaml"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment"># Local search</span></span><br><span class="line"><span class="attr">local_search:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<h3 id="3-编辑主题配置文件，新增以下内容："><a href="#3-编辑主题配置文件，新增以下内容：" class="headerlink" title="3.编辑主题配置文件，新增以下内容："></a>3.编辑主题配置文件，新增以下内容：</h3><figure class="highlight yaml"><table><tbody><tr><td class="code"><pre><span class="line"><span class="attr">search:</span></span><br><span class="line">  <span class="attr">path:</span> <span class="string">search.xml</span></span><br><span class="line">  <span class="attr">field:</span> <span class="string">post</span></span><br><span class="line">  <span class="attr">format:</span> <span class="string">html</span></span><br><span class="line">  <span class="attr">limit:</span> <span class="number">10000</span></span><br></pre></td></tr></tbody></table></figure>
-
-</body></html>]]></content>
-      <tags>
-        <tag>Hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>minecraft-server-client</title>
-    <url>/2021/08/24/minecraft/</url>
-    <content><![CDATA[<html><head></head><body><p>Server端：</p>
-<ol>
-<li><p>docker  image</p>
-<p>获取镜像</p>
-<p>docker pull ubuntu:18.04</p>
-</li>
-<li><p>下载服务器包server.jar</p>
-</li>
-</ol>
-<ol start="3">
-<li><p>下载jdk，配置jdk环境</p>
-</li>
-<li><p>启动mc服务器</p>
-</li>
-</ol>
-<p>Client端：</p>
-<ol>
-<li><p>java环境</p>
-<p>java 16.0.2</p>
-</li>
-<li><p>启动端下载与配置</p>
-<p>HMCL</p>
-<p>配置本体目录，java目录 16.0.2</p>
-</li>
-<li><p>游戏本体下载</p>
-</li>
-</ol>
-</body></html>]]></content>
-  </entry>
-  <entry>
-    <title>preprocess--nunet</title>
-    <url>/2021/08/27/preprocess-nunet/</url>
-    <content><![CDATA[<html><head></head><body><p><a href="https://zhuanlan.zhihu.com/p/335970913">https://zhuanlan.zhihu.com/p/335970913</a></p>
-<p>Leaky ReLU</p>
-<p>对于ReLU, 当输入为负值的时候，ReLU 的学习速度可能会变得很慢，甚至使神经元直接无效，因为此时输入小于零而梯度为零，从而其权重无法得到更新，在剩下的训练过程中会一直保持静默。</p>
-<p>instanceNorm在图像像素上，对HW做归一化，与batch size无关；</p>
-<p>IN在计算归一化统计量时并没有像BN那样跨样本、单通道，也没有像LN那样单样本、跨通道。它是取的单通道，单样本上的数据进行计算</p>
-<p>图像裁剪Crop</p>
-<p>图像裁剪就是将三维的医学图像裁剪到它的非零区域，具体方法就是在图像中寻找一个最小的三维bounding box，该bounding box区域以外的值为0，使用这个bounding box对图像进行裁剪。相比裁剪前，裁剪后的图像对于最后的分割结果没有影响，但是却可以减小图像尺寸，避免无用的计算，提高计算效率。有效解决外围全黑背景相对较多的问题，</p>
-<img src="/2021/08/27/preprocess-nunet/003-23.png" alt="003-23" style="zoom:25%;">
-
-<p>裁剪可以分为以下3步：</p>
-<p>第一步根据三维图像数据data(C,X,Y)生成三维的非零模板nonzero_mask，标示图像中哪些区域是非零的 。调用scipy库的binary_fill_holes函数对生成的nonzero_mask进行填充。</p>
-<p>第二步根据生成的非零模板，确定用于裁剪的bounding_box大小和位置，在代码中就是要找到nonzero_mask在x，y，z三个坐标轴上值为1的最小坐标值以及最大坐标值。</p>
-<p>第三步就根据bounding_box对图像依次进行裁剪，然后重新组合在一起。</p>
-<p>注：在对原始数据裁剪完毕之后，使用同样的bounding box对分割标注seg进行裁剪，</p>
-<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">#按照spacing 进行 标准正态化</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_do_separate_z</span>(<span class="params">spacing, anisotropy_threshold=RESAMPLING_SEPARATE_Z_ANISO_THRESHOLD</span>):</span></span><br><span class="line">    do_separate_z = (np.<span class="built_in">max</span>(spacing) / np.<span class="built_in">min</span>(spacing)) &gt; anisotropy_threshold</span><br><span class="line">    <span class="keyword">return</span> do_separate_z</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-
-
-
-
-<p>重采样</p>
-<p>数据集中存在不同spacing的数据，默认自动归一化到数据集所有数据spacing的中值spacing。原始数据使用三阶spline插值；Mask使用最邻近插值。</p>
-<p>目的是解决在一些三维医学图像数据集中，不同的图像中单个体素voxel所代表的实际空间大小spacing不一致的问题。因为卷积神经网络只在体素空间中进行操作，会忽视掉实际物理空间中大小信息。为了避免这种差异性，需要对不同图像数据在体素空间进行resize，保证不同的图像数据中，每个体素所代表的实际物理空间一致。</p>
-<p>具体需要将整个数据集resample到多大的spacing，即目标空间大小target_spacing应该多大呢？nnUNet给出的建议是在大多数时候使用数据集各个图像不同spacing的中值，但是在各向异性（最大坐标上的spacing÷最小坐标上的spacing&gt;3）的数据集中，取数据集10%分位点的spacing值作为spacing最大坐标的目标空间大小会是更好的选择。重采样的步骤可以简单分成3步。</p>
-<p>第一步是确定重采样的目标空间大小。在之前数据格式转换的时候，每个数据的spacing信息存储在对应的pickle文件中，需要依次进行读取，然后一起存放在一个列表spacings当中。之后调用numpy中函数统计每个维度spacing的中值即可。</p>
-<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">#重采样Resample</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>而非CT图像的normalization相对简单一些，只需1步，每张三维图像只利用自身均值和标准差进行z-scoring即可。</p>
-<p>CT图像的normalization</p>
-<p>第一步是收集整个CT影像训练集前景的统计信息。data代表CT图像的三维数据。seg是存放分割标注信息的三维数组，根据crop步骤中的处理, 标注值为-1代表0值背景,标注值为0代表非0值的背景，而大于0代表不同的前景标签。nnUNet为了简便计算，对每张图像仅采样1/10的前景体素用于统计，存储在voxels列表中。通过对训练集中每张训练数据的遍历，将采样到的前景体素列表voxels拼接在一块，即voxels_all</p>
-<p>第二步调用numpy中的函数统计整个训练集前景的均值，标准差，0.5%分位HU值，99.5%分位HU值，并利用这些统计信息对每张图像进行clip以及z-scoring。代码中用use_nonzero_mask指示是否只在nonzero区域进行normalization</p>
-</body></html>]]></content>
-      <tags>
-        <tag>nnunet</tag>
-        <tag>preprocess</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>pycrypto的安装</title>
-    <url>/2021/08/14/pycrypto%E5%AE%89%E8%A3%85/</url>
-    <content><![CDATA[<html><head></head><body><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">pip install pycrypto</span><br></pre></td></tr></tbody></table></figure>
-
-</body></html>]]></content>
-      <categories>
-        <category>Diary</category>
-      </categories>
-      <tags>
-        <tag>pycrypto</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>python自动化生成报告</title>
-    <url>/2021/08/20/python-auto-docx/</url>
-    <content><![CDATA[<html><head></head><body><ol>
-<li><p>引入相关库文件</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">import docx </span><br><span class="line">import os</span><br><span class="line">from PIL import Image</span><br><span class="line">from datetime import datetime</span><br><span class="line">from datetime import timedelta</span><br><span class="line">from datetime import timezone</span><br><span class="line">from docx.enum.text import WD_ALIGN_PARAGRAPH</span><br><span class="line">from docx.enum.text import WD_PARAGRAPH_ALIGNMENT</span><br><span class="line">from easydict import EasyDict  </span><br><span class="line">import re</span><br><span class="line">import pandas as pd</span><br></pre></td></tr></tbody></table></figure></li>
-<li><p>文档信息</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#打开demo.docx文档，返回一个Document对象，它有paragraphs属性，是Paragraph对象的列表。</span><br><span class="line">doc = docx.Document()</span><br><span class="line">header = doc.sections[0].header</span><br><span class="line">paragraph = header.paragraphs[0]</span><br><span class="line">paragraph.add_run('Dylan@www.example.com')</span><br><span class="line">paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER</span><br><span class="line"></span><br><span class="line">paraObj0=doc.add_paragraph('文档生成','Title')</span><br><span class="line">paraObj0.alignment=WD_ALIGN_PARAGRAPH.CENTER</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">resTime='2021-8-20'</span><br><span class="line">paraObj1=doc.add_paragraph('python')</span><br><span class="line">paraObj1.alignment=WD_ALIGN_PARAGRAPH.CENTER</span><br><span class="line"></span><br><span class="line">paraObj2=doc.add_paragraph(resTime)</span><br><span class="line">paraObj2.alignment=WD_ALIGN_PARAGRAPH.CENTER</span><br></pre></td></tr></tbody></table></figure></li>
-<li><p>表格</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">df = pd.read_excel('./web.xlsx')</span><br><span class="line">print('web imgs number is',len(df.index.values))</span><br><span class="line">table = doc.add_table(rows=1, cols=3,style='Table Grid')</span><br><span class="line">hdr_cells = table.rows[0].cells</span><br><span class="line">hdr_cells[0].text = '图片名称'</span><br><span class="line">hdr_cells[1].text = '危险程度'</span><br><span class="line">hdr_cells[2].text = '置信度'</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">row_cells = table.add_row().cells</span><br><span class="line">row_cells[0].text = str(pic_name)</span><br><span class="line">row_cells[1].text = conf.dangeStr[danger]</span><br><span class="line">row_cells[2].text = str(confident)</span><br></pre></td></tr></tbody></table></figure></li>
-</ol>
-<p><a href="Getdocx.py" title="源码下载">点击下载完整代码</a></p>
-</body></html>]]></content>
-      <tags>
-        <tag>python</tag>
-        <tag>auto</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>python 自动生成代码工具</title>
-    <url>/2021/08/20/python-auto-coding/</url>
-    <content><![CDATA[<html><head></head><body></body></html>]]></content>
-      <tags>
-        <tag>python</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>python compiler——基于python的python编译器</title>
-    <url>/2021/08/20/python-compiler/</url>
-    <content><![CDATA[<html><head></head><body></body></html>]]></content>
-  </entry>
-  <entry>
-    <title>python log</title>
-    <url>/2021/08/29/python-log/</url>
-    <content><![CDATA[<html><head></head><body><figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment"># DEBUG &lt; INFO &lt; WARN &lt; ERROR &lt; FATAL</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line">logging.basicConfig(<span class="built_in">format</span>=<span class="string">'%(asctime)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s'</span>,</span><br><span class="line">level=logging.INFO, filemode=<span class="string">'w'</span>, filename=<span class="string">'./log/log.txt'</span>)</span><br><span class="line"><span class="comment"># w 覆盖重写 ，a追加</span></span><br><span class="line">logging.error(<span class="string">"这是一条error信息的打印"</span>)</span><br><span class="line">logging.info(<span class="string">"这是一条info信息的打印"</span>)</span><br><span class="line">logging.warning(<span class="string">"这是一条warn信息的打印"</span>)</span><br><span class="line">logging.debug(<span class="string">"这是一条debug信息的打印"</span>)</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
-
-</body></html>]]></content>
-      <tags>
-        <tag>python</tag>
-        <tag>log</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>screen</title>
-    <url>/2021/08/26/screen/</url>
-    <content><![CDATA[<html><head></head><body><h1 id="Linux将screen屏幕标准输出输出到日志中"><a href="#Linux将screen屏幕标准输出输出到日志中" class="headerlink" title="Linux将screen屏幕标准输出输出到日志中"></a>Linux将screen屏幕标准输出输出到日志中</h1><p>创建终端</p>
-<figure class="highlight shell"><table><tbody><tr><td class="code"><pre><span class="line">screen -S NAME</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<p>连接终端</p>
-<figure class="highlight shell"><table><tbody><tr><td class="code"><pre><span class="line">screen -R NAME</span><br></pre></td></tr></tbody></table></figure>
-
-</body></html>]]></content>
-  </entry>
-  <entry>
     <title>python 包管理与目录管理</title>
     <url>/2021/09/05/python-%E5%8C%85%E7%AE%A1%E7%90%86%E4%B8%8E%E7%9B%AE%E5%BD%95%E7%AE%A1%E7%90%86/</url>
     <content><![CDATA[<html><head></head><body><p><a href="https://blog.csdn.net/Jeff888999/article/details/104161701">参考</a></p>
@@ -651,142 +783,21 @@
 <figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">from package1.subPack1 import *</span><br></pre></td></tr></tbody></table></figure>
 
 <p>以*导入时，package内的module是受__init__.py限制的</p>
+<p>1.</p>
 </body></html>]]></content>
       <tags>
         <tag>python</tag>
       </tags>
   </entry>
   <entry>
-    <title>medical segmentation</title>
-    <url>/2021/08/20/medical-segmentation/</url>
-    <content><![CDATA[<html><head></head><body><ol>
-<li><h3 id="nii-gz-和-nii文件"><a href="#nii-gz-和-nii文件" class="headerlink" title=".nii.gz 和.nii文件"></a>.nii.gz 和.nii文件</h3><p>区域：喉癌和下咽癌癌灶，都是发生在咽喉部位的恶性肿瘤疾病。</p>
-<p>患有下咽癌，多数患者都会出现明显的临床症状表现，主要有咽喉部异物感、吞咽疼痛以及颈部肿块、声嘶、咯血、呼吸困难等。而喉癌的症状主要有声音嘶哑、吞咽困难、呼吸困难、痰中带血等</p>
-<p>下咽癌诊断方法多，常用的主要有六种，分别是颈部检查、喉咽部检查、细胞学检查、MRI检查(核磁共振成像)、喉X线体层拍片检查、常规X线检查等。而喉癌的诊断方法主要有喉镜检查、病理组织活检、CT检查、超声检查等。</p>
-<p>图像：增强 CT 成像</p>
-<p>标准NIfTI图像的扩展名是.nii，包含了头文件及图像资料。由于NIfTI格式和Analyze格式的关系，因此NIfTI格式也可使用独立的图像文件[.img]和头文件[.hdr]。</p>
-<p>nii格式和.nii.gz格式是一个东西，freesurfer中可以直接调用除了dicom和.nii.gz也可以直接调用.nii</p>
-<p>python可使用sitk查看</p>
-<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> SimpleITK <span class="keyword">as</span> sitk</span><br><span class="line">itk_img = sitk.ReadImage(os.path.join(imageDir,ele))   <span class="comment">#（X，Y，Z）</span></span><br><span class="line">img = sitk.GetArrayFromImage(itk_img)</span><br><span class="line"></span><br><span class="line">name=<span class="string">'001'</span></span><br><span class="line">out = sitk.GetImageFromArray(img)</span><br><span class="line">sitk.WriteImage(out,os.path.join(outdir,name+<span class="string">'.nii.gz'</span>))</span><br></pre></td></tr></tbody></table></figure></li>
-<li><p>评价指标</p>
-</li>
-<li><p>Sota 模型</p>
-<p><a href="https://github.com/JunMa11/SOTA-MedSeg">截止到2021.1的sota模型</a></p>
-<p><a href="https://github.com/MIC-DKFZ/nnUNet">nnUet</a></p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">conda install pytorch==1.8.0 torchvision==0.9.0 torchaudio==0.8.0 cudatoolkit=10.2 -c pytorch</span><br><span class="line">pip install nnunet</span><br><span class="line"></span><br><span class="line">pip install --upgrade git+https://github.com/FabianIsensee/hiddenlayer.git@more_plotted_details#egg=hiddenlayer</span><br><span class="line"></span><br><span class="line">vim ~/.bashrc</span><br><span class="line">export nnUNet_raw_data_base="/home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw"                   </span><br><span class="line">export nnUNet_preprocessed="/home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_preprocessed"</span><br><span class="line">export RESULTS_FOLDER="/home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_trained_models"</span><br><span class="line">source ~/.bashrc</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line">nnUNet_convert_decathlon_task -i /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw/nnUNet_raw_data/Task05_Tumour</span><br><span class="line"></span><br><span class="line">nnUNet_plan_and_preprocess -t 5 --verify_dataset_integrity</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=1 nnUNet_train 2d nnUNetTrainerV2 5 0  --npz</span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=2 nnUNet_train 2d nnUNetTrainerV2 5 1</span><br><span class="line"></span><br><span class="line">nohup sh s2df1.sh &gt;fold1 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=3 nnUNet_train 2d nnUNetTrainerV2 5 2</span><br><span class="line"></span><br><span class="line">nohup sh s2df2.sh &gt;2d-fold2 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_train 3d_fullres nnUNetTrainerV2 5 3 -c --npz</span><br><span class="line"></span><br><span class="line">nohup sh s2df3.sh &gt;2d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=5 nnUNet_train 2d nnUNetTrainerV2 5 4</span><br><span class="line"></span><br><span class="line">nohup sh s2df4.sh &gt;2d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">s2df4</span><br><span class="line">#!/bin/sh</span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c --npz</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nohup sh s2df1.sh &gt;2d-fold1 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df2.sh &gt;2d-fold2 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df3.sh &gt;2d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df4.sh &gt;2d-fold4 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s2df5.sh &gt;2d-fold5 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nnUNet_find_best_configuration -m 2d -t 5 --strict</span><br><span class="line"></span><br><span class="line">nnUNet_predict -i /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw/nnUNet_raw_data/Task005_Tumour/imagesTs -o /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/res/2d -tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 2d -p nnUNetPlansv2.1 -t Task005_Tumour</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_predict -i /home/haitaowu/2021summer/final/nnUNetFrame/Res/ct_gz -o /home/haitaowu/2021summer/final/nnUNetFrame/Res/ctPredict -tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 2d -p nnUNetPlansv2.1 -t Task005_Tumour</span><br><span class="line"></span><br><span class="line">nohup sh s3dLowf1.sh &gt;fold1 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nohup sh s3df1.sh &gt;3d-fold1 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df2.sh &gt;3d-fold2 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df3.sh &gt;3d-fold3 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df4.sh &gt;3d-fold4 2&gt;&amp;1 &amp;</span><br><span class="line">nohup sh s3df5.sh &gt;3d-fold5 2&gt;&amp;1 &amp;</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=4 nnUNet_train 3d_fullres nnUNetTrainerV2 5 2 -c --npz</span><br></pre></td></tr></tbody></table></figure>
-
-<p>008.nii.gz 不行</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">##2D</span><br><span class="line">RuntimeError: MultiThreadedAugmenter.abort_event was set, something went wrong. Maybe one of your workers crashed. This is not the actual error message! Look further up your stdout to see what caused the error. Please also check whether your RAM was full</span><br><span class="line">需要加上参数--ipc=host</span><br><span class="line">pytorch 1.6.0 py3.8_cuda10.1.243_cudnn7.6.3_0 pytorch</span><br><span class="line">conda install pytorch==1.8.0 torchvision==0.9.0 torchaudio==0.8.0 cudatoolkit=10.2 -c pytorch</span><br><span class="line"></span><br><span class="line">##3D full resolution U-Net</span><br><span class="line">nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line">nnUNet_train 2d nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">nohup nnUNet_train 3d_fullres nnUNetTrainerV2 5 4 -c &amp;</span><br><span class="line">返回shell</span><br><span class="line">输入exit退出终端</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=0 nnUNet_train 3d_lowres nnUNetTrainerV2 5 4 --npz</span><br><span class="line"></span><br><span class="line">nnUNet_train 3d_lowres nnUNetTrainerV2 5 4 -c</span><br><span class="line"></span><br><span class="line">nnUNet_find_best_configuration -m 3d_fullres  -t 5 --strict</span><br><span class="line"></span><br><span class="line">nnUNet_find_best_configuration -m 2d 3d_fullres 3d_lowres 3d_cascade_fullres -t XXX --strict</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=6 nnUNet_predict -i /home/haitaowu/2021summer/final/nnUNetFrame/Res/ct -o /home/haitaowu/2021summer/final/nnUNetFrame/Res/tmp2 -tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 2d -p nnUNetPlansv2.1 -t Task005_Tumour --save_npz</span><br><span class="line"></span><br><span class="line">CUDA_VISIBLE_DEVICES=0 nnUNet_predict \</span><br><span class="line">-i /home/haitaowu/2021summer/final/nnUNetFrame/DATASET/nnUNet_raw/nnUNet_raw_data/Task005_Tumour/imagesTs \</span><br><span class="line">-o /home/haitaowu/2021summer/final/nnUNetFrame/Res/tmp \</span><br><span class="line">-tr nnUNetTrainerV2 -ctr nnUNetTrainerV2CascadeFullRes -m 3d_fullres -p nnUNetPlansv2.1 -t Task005_Tumour --save_npz</span><br><span class="line"></span><br><span class="line">nnUNet_ensemble -f OUTPUT_DIRECTORY_3D OUTPUT_DIRECTORY_2D -o OUTPUT_FOLDER_ENSEMBLE -pp POSTPROCESSING_FILE</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure></li>
-<li><p>比赛运行命令</p>
-<p>1.</p>
-<p>2.</p>
-</li>
-<li><p>?</p>
-</li>
-</ol>
-</body></html>]]></content>
-  </entry>
-  <entry>
-    <title>server connect</title>
-    <url>/2021/08/22/server-connect/</url>
-    <content><![CDATA[<html><head></head><body><p>ssh -R 反向代理 选择端口</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">netstat -anp|grep :2000</span><br><span class="line">netstat -tunlp | grep 2000</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">ssh  -R 2000 user@xxx.xx.x.xx -p xxxx</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-</body></html>]]></content>
-  </entry>
-  <entry>
-    <title>Hexo Use SSH</title>
-    <url>/2021/08/12/startSSH/</url>
-    <content><![CDATA[<html><head></head><body><ol>
-<li> 设置本机rsa，并将rsa.pub添加到github设置中</li>
-<li>将config.yml 中 deploy中的repo从https改为<a href="mailto:git@github.com">git@github.com</a>:Dylan-get/Dylan-get.github.io.git，即可使用ssh，只需要输入本机访问rsa的密码</li>
-</ol>
-</body></html>]]></content>
-      <categories>
-        <category>Diary</category>
-      </categories>
-      <tags>
-        <tag>Hexo</tag>
-        <tag>SSH</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Streamlit</title>
-    <url>/2021/08/14/streamlit/</url>
-    <content><![CDATA[<html><head></head><body><p><img src="/2021/08/14/streamlit/streamlit_hello.png" alt="你想输入的替代文字"></p>
-<ol>
-<li><p>环境配置</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">pip install streamlit</span><br></pre></td></tr></tbody></table></figure>
-
-<p>运行尝试：</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">streamlit hello</span><br></pre></td></tr></tbody></table></figure>
-
-<p>出现该页面，成功</p>
-<p><img src="/2021/08/14/streamlit/image-20210830080115632.png" alt="image-20210830080115632"></p>
-</li>
-<li><p>原理</p>
-<p>总而言之，Streamlit是这样工作的：</p>
-<ol>
-<li><p>为每个用户交互从头开始运行整个脚本。</p>
-</li>
-<li><p>Streamlit为每个变量配置指定微件状态的最新值。</p>
-</li>
-<li><p>缓存允许Streamlit跳过冗余的数据提取和计算步骤。</p>
-</li>
-</ol>
-</li>
-<li><p>ui</p>
-<p>运行</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">streamlit run your_script.py [-- script args]</span><br></pre></td></tr></tbody></table></figure></li>
-<li><p>d</p>
-</li>
-</ol>
-</body></html>]]></content>
-      <tags>
-        <tag>Streamlit</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>xml-yml解析</title>
-    <url>/2021/09/03/xml-yaml%E8%A7%A3%E6%9E%90/</url>
-    <content><![CDATA[<html><head></head><body><p>xml</p>
-<p>可扩展标记语言 (Extensible Markup Language, XML) ，用于标记电子文件使其具有结构性的标记语言，可以用来标记数据、定义数据类型，是一种允许用户对自己的标记语言进行定义的源语言。 XML是标准通用标记语言 (SGML) 的子集，非常适合 Web 传输。XML 提供统一的方法来描述和交换独立于应用程序或供应商的结构化数据。</p>
-<ul>
-<li>YAML易于人们阅读。</li>
-<li>YAML数据在编程语言之间是可移植的。</li>
-<li>YAML匹配敏捷语言的本机数据结构。</li>
-<li>YAML具有一致的模型来支持通用工具。</li>
-<li>YAML支持单程处理。</li>
-<li>YAML具有表现力和可扩展性。</li>
-<li>YAML易于实现和使用。</li>
+    <title>unet</title>
+    <url>/2021/09/17/unet/</url>
+    <content><![CDATA[<html><head></head><body><ul>
+<li>strong use of data augmentation</li>
+<li>upsampling part</li>
+<li></li>
 </ul>
-<p>yaml</p>
-<p>YAML 作为一种比 XML 更为简单易读的序列化语言，正越来越多地被用于应用及配置文件的开发中。</p>
-<figure class="highlight yaml"><table><tbody><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="attr">k:</span> <span class="string">v</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#字符串</span></span><br><span class="line"><span class="string">字符串默认不用加上单引号或者双绰号；</span></span><br><span class="line"><span class="string">''</span><span class="string">：单引号；会转义特殊字符，特殊字符最终只是一个普通的字符串数据</span></span><br><span class="line"><span class="string">""</span><span class="string">:</span> <span class="string">双引号；不会转义字符串里面的特殊字符；特殊字符会作为本身想表示的意思</span></span><br><span class="line"></span><br><span class="line"><span class="attr">name:</span> <span class="string">"zhangsan \n lisi"</span><span class="string">：</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#日期</span></span><br><span class="line"><span class="attr">date:</span> <span class="number">2019</span><span class="string">/01/01</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#对象：属、性值	</span></span><br><span class="line"><span class="comment">#多行</span></span><br><span class="line"><span class="attr">people:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">zhangsan</span></span><br><span class="line">    <span class="attr">age:</span> <span class="number">20</span>   </span><br><span class="line"><span class="comment">#单行</span></span><br><span class="line"><span class="attr">people:</span> {<span class="string">name:zhangsan</span>,<span class="attr">age:</span> <span class="number">20</span>}</span><br><span class="line"></span><br><span class="line"><span class="comment">#数组、list、set</span></span><br><span class="line"><span class="attr">pets:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">dog</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">pig</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">cat</span></span><br><span class="line"><span class="comment">#单行</span></span><br><span class="line"><span class="attr">pets:</span> [<span class="string">dog</span>,<span class="string">pig</span>,<span class="string">cat</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#数组对象、list对象、set对象</span></span><br><span class="line"><span class="attr">peoples:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">zhangsan</span></span><br><span class="line">      <span class="attr">age:</span> <span class="number">22</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">lisi</span></span><br><span class="line">      <span class="attr">age:</span> <span class="number">20</span></span><br><span class="line">    <span class="bullet">-</span> {<span class="attr">name:</span> <span class="string">wangwu</span>,<span class="attr">age:</span> <span class="number">18</span>}</span><br><span class="line">    </span><br><span class="line"><span class="comment">#文档块</span></span><br><span class="line"><span class="comment">#对于测试环境，预生产环境，生产环境可以使用不同的配置，如果只想写到一个文件中，yml与是支持的,每个块用----隔开</span></span><br><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8081</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span></span><br><span class="line">    <span class="attr">active:</span> <span class="string">prod</span> <span class="comment">#激活对应的文档块</span></span><br><span class="line"></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8083</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span> <span class="string">dev</span> <span class="comment">#指定属于哪个环境</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8084</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span> <span class="string">prod</span>  <span class="comment">#指定属于哪个环境</span></span><br></pre></td></tr></tbody></table></figure>
-
-
-
-
-
-<p>语法</p>
-<ul>
-<li>k: v 表示键值对关系，冒号后面必须有一个空格</li>
-<li>使用空格的缩进表示层级关系，空格数目不重要，只要是左对齐的一列数据，都是同一个层级的</li>
-<li>大小写敏感</li>
-<li>缩进时不允许使用Tab键，只允许使用空格。</li>
-<li>松散表示，java中对于驼峰命名法，可用原名或使用-代替驼峰，如java中的lastName属性,在yml中使用lastName或 last-name都可正确映射。</li>
-</ul>
-<h4 id=""><a href="#" class="headerlink" title=""></a></h4></body></html>]]></content>
+</body></html>]]></content>
   </entry>
   <entry>
     <title>zip、tar、gzip  打包与压缩</title>
@@ -799,7 +810,7 @@
 <li>-q 不显示指令执行过程</li>
 <li>-r 递归处理，将指定目录下的所有文件和子目录一并处理</li>
 </ul>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">unzip name.zip</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">unzip test.zip <span class="comment">#解压到当前文件下</span></span><br><span class="line">unzip -n test.zip -d /tmp <span class="comment">#解压到/tmp目录下，并且不要覆盖已有文件</span></span><br><span class="line">unzip -v test.zip <span class="comment">#查看test.zip内容，但不解压</span></span><br><span class="line">unzip -o test.zip -d tmp/ <span class="comment">#解压到/tmp目录下，并且覆盖已有文件</span></span><br></pre></td></tr></tbody></table></figure>
 
 <ul>
 <li>-v 查看压缩文件目录信息，但是不解压该文件</li>
@@ -841,19 +852,295 @@
       </tags>
   </entry>
   <entry>
-    <title>网页前端 框架</title>
-    <url>/2021/09/06/%E7%BD%91%E9%A1%B5%E5%89%8D%E7%AB%AF-%E6%A1%86%E6%9E%B6/</url>
-    <content><![CDATA[<html><head></head><body><h1 id="框架解析："><a href="#框架解析：" class="headerlink" title="框架解析："></a>框架解析：</h1><h2 id="VUE是什么？"><a href="#VUE是什么？" class="headerlink" title="VUE是什么？"></a>VUE是什么？</h2><p>是一个用于创建用户界面的开源JavaScript框架，也是一个创建单页应用的Web应用框架。 2016年一项针对JavaScript的调查表明，Vue有着89%的开发者满意度。</p>
-<p>在GitHub上，该项目平均每天能收获95颗星，[为Github有史以来星标数第3多的项目</p>
-<h2 id="ECharts是什么？"><a href="#ECharts是什么？" class="headerlink" title="ECharts是什么？"></a>ECharts是什么？</h2><p>它是一个数据可视化框架，可以流畅的运行在 PC 和移动设备上，兼容当前绝大部分浏览器，供了 图例、视觉映射、数据区域缩放、tooltip、数据刷选等开箱即用的交互组件，可以对数据进行多维度数据筛取、视图缩放、展示细节等交互操作，让你的数据形象生动起来，不再是简简单单的一个表格。</p>
-<h2 id="AntV是什么？"><a href="#AntV是什么？" class="headerlink" title="AntV是什么？"></a>AntV是什么？</h2><p>蚂蚁金服全新一代数据可视化前端框架，短短几行代码就能够做出精美的数据图表，甚至兼容pc端和移动端。</p>
-<h2 id="Element是什么？"><a href="#Element是什么？" class="headerlink" title="Element是什么？"></a>Element是什么？</h2><p>前端工程师喜爱的css框架，能够提供精美的组件，开箱即用，并且具有良好的兼容性，熟练使用css框架，能够减少大部分开发时间（写界面的时间），从而专注于业务代码的实现。</p>
-<h2 id="Taro是什么？"><a href="#Taro是什么？" class="headerlink" title="Taro是什么？"></a>Taro是什么？</h2><p>在开发中，我们经常烦恼网页一种代码，小程序一种代码，那么到底有没有办法让我们只开发一种，然后可以用在所有的地方呢？</p>
-<p>还真有，这个框架让你的代码在多种环境下都能够跑起来，<strong>Taro，多端统一开发解决方案</strong>，意味着你用这个框架开发出来的项目，能够运行在各个平台上。</p>
-<h2 id="Taro-UI是什么？"><a href="#Taro-UI是什么？" class="headerlink" title="Taro UI是什么？"></a>Taro UI是什么？</h2><p>这是一款基于taro框架开发的多端UI组件库，强大的交互组件，让你的开发更加高效。</p>
-<h2 id="uni-app是什么？"><a href="#uni-app是什么？" class="headerlink" title="uni-app是什么？"></a>uni-app是什么？</h2><p>和Taro一样，也是一个多端统一开发解决方案，但是这个框架熟悉的人比较多，使用的人也比较多，博主也是在使用中一个框架，上手比较快，值得推荐。</p>
-<h2 id="stylus"><a href="#stylus" class="headerlink" title="stylus"></a>stylus</h2><p>强大的css预处理器，让css书写更加随意，可以有函数，变量计算，动态引入，条件表达等等，用了直呼爽，后悔不早用。</p>
-<h2 id="jquery"><a href="#jquery" class="headerlink" title="jquery"></a>jquery</h2><p>jquery不能说为技术，jQuery，顾名思议，也就是JavaScript和查询（Query），即是辅助JavaScript开发的库。</p>
+    <title>人脸识别</title>
+    <url>/2021/09/17/%E4%BA%BA%E8%84%B8%E8%AF%86%E5%88%AB/</url>
+    <content><![CDATA[<html><head></head><body><h1 id="1-背景"><a href="#1-背景" class="headerlink" title="1. 背景"></a>1. 背景</h1><p>存在部分遮挡的情况下的人脸识别</p>
+<h2 id="1-1-已有研究"><a href="#1-1-已有研究" class="headerlink" title="1.1 已有研究"></a>1.1 已有研究</h2><h3 id="1-1-1-人脸对齐、人脸关键点-Face-Alignment"><a href="#1-1-1-人脸对齐、人脸关键点-Face-Alignment" class="headerlink" title="1.1.1 人脸对齐、人脸关键点 Face Alignment"></a>1.1.1 人脸对齐、人脸关键点 Face Alignment</h3><img src="/2021/09/17/%E4%BA%BA%E8%84%B8%E8%AF%86%E5%88%AB/68747470733a2f2f696e7369676874666163652e61692f6173736574732f696d672f637573746f6d2f7468756d625f7364756e65742e706e67-1868620.png" alt="68747470733a2f2f696e7369676874666163652e61692f6173736574732f696d672f637573746f6d2f7468756d625f7364756e65742e706e67" style="zoom: 33%;">
+
+<ul>
+<li><a href="https://github.com/deepinsight/insightface/blob/master/alignment/heatmap">SDUNets (BMVC’2018)</a></li>
+</ul>
+<h3 id="1-1-2-人脸识别"><a href="#1-1-2-人脸识别" class="headerlink" title="1.1.2 人脸识别"></a>1.1.2 人脸识别</h3><img src="/2021/09/17/%E4%BA%BA%E8%84%B8%E8%AF%86%E5%88%AB/68747470733a2f2f696e7369676874666163652e61692f6173736574732f696d672f6769746875622f666163657265636f676e6974696f6e66726f6d766964656f2e504e47.png" alt="68747470733a2f2f696e7369676874666163652e61692f6173736574732f696d672f6769746875622f666163657265636f676e6974696f6e66726f6d766964656f2e504e47" style="zoom: 33%;">
+
+<ul>
+<li><a href="https://github.com/deepinsight/insightface/blob/master/recognition/arcface_mxnet">ArcFace_mxnet (CVPR’2019)</a></li>
+</ul>
+<h3 id="1-1-3-硬件方面"><a href="#1-1-3-硬件方面" class="headerlink" title="1.1.3 硬件方面"></a>1.1.3 硬件方面</h3><p>机器人二次开发（可编程机器人）：实现人脸检测与识别，问答系统，语音合成，机械控制。 c语言机器人、深度学习模型的服务器</p>
+<h2 id="1-2-相关工作"><a href="#1-2-相关工作" class="headerlink" title="1.2 相关工作"></a>1.2 相关工作</h2><h3 id="1-2-1-latest-work"><a href="#1-2-1-latest-work" class="headerlink" title="1.2.1 latest work"></a>1.2.1 latest work</h3><h1 id="2"><a href="#2" class="headerlink" title="2."></a>2.</h1></body></html>]]></content>
+  </entry>
+  <entry>
+    <title>优化器</title>
+    <url>/2021/09/12/%E4%BC%98%E5%8C%96%E5%99%A8/</url>
+    <content><![CDATA[<html><head></head><body><p>INFO：</p>
+<h1 id="momentum："><a href="#momentum：" class="headerlink" title="momentum："></a>momentum：</h1><p>参数更新方向不仅由当前的梯度决定，也与此前累积的下降方向有关</p>
+<p>加入了一个惯性，在坡度比较陡的地方，会有较大的惯性，这是下降的多。坡度平缓的地方，惯性较小，下降的会比较慢。</p>
+<h1 id="1-SGD优化器"><a href="#1-SGD优化器" class="headerlink" title="1.SGD优化器"></a>1.SGD优化器</h1><p>全称Stochastic Gradient Descent，随机梯度下降，基本思想可以追溯到20世纪50年代的<a href="https://en.wikipedia.org/wiki/Robbins%E2%80%93Monro_algorithm">罗宾斯-蒙罗算法</a>。每次选择一个mini-batch，而不是全部样本，使用梯度下降来更新模型参数。它解决了随机小批量样本的问题，但仍然有自适应学习率、容易卡在梯度较小点等问题。朴素 SGD，没有动量的概念</p>
+<h1 id="2-Adam优化器"><a href="#2-Adam优化器" class="headerlink" title="2.Adam优化器"></a>2.Adam优化器</h1><p>Adam在训练集中收敛速度最快，但是测试集的效果并不是非常的好,在某些情况下会出现无法收敛的情况</p>
+<p>Adam在训练集上的准确率较高，SGDM在测试集上的准确率较高</p>
+<p>Adam的速度更快，但SGDM能够得到好的效果</p>
+<p>Adam 得到最优解多数时候是 Sharp Minimum，而 SGDM得到往往是Flat Minimum</p>
+<p>Adam 在 SGDM的基础上增加了自适应学习率机制，能够使Adam针对不同的参数分配不同的学习率，从而增加优化速度</p>
+<p><a href="https://en.wikipedia.org/wiki/Stochastic_gradient_descent">维基百科</a></p>
+<p><a href="https://www.jiqizhixin.com/graph/technologies/8e284b12-a865-4915-adda-508a320eefde">参考网址</a></p>
+</body></html>]]></content>
+  </entry>
+  <entry>
+    <title>3D-多模态医学影像分割</title>
+    <url>/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/</url>
+    <content><![CDATA[<html><head></head><body><p>[TOC]</p>
+<h1 id="1-研究背景"><a href="#1-研究背景" class="headerlink" title="1. 研究背景"></a>1. 研究背景</h1><p>目的：通过深度学习模型对医学影像的识别，快速准确的判断患者的病情</p>
+<h2 id="1-1-已有研究"><a href="#1-1-已有研究" class="headerlink" title="1.1 已有研究"></a>1.1 已有研究</h2><h3 id="1-1-1-有关医学影像分割的研究"><a href="#1-1-1-有关医学影像分割的研究" class="headerlink" title="1.1.1 有关医学影像分割的研究"></a>1.1.1 有关医学影像分割的研究</h3><p>baseline: a standard measurement or fact against which other measurements or facts are compared, especially in medicine or science.</p>
+<p>benchmark: something that is used as a standard by which other things can be judged or measured.</p>
+<p>ground truth：a term used in various fields to refer to information that is known to be real or true, provided by direct observation and measurement (i.e. empirical evidence) as opposed to information provided by inference.</p>
+<h4 id="Medical-Image-Segmentation-subtasks："><a href="#Medical-Image-Segmentation-subtasks：" class="headerlink" title="Medical Image Segmentation subtasks："></a>Medical Image Segmentation subtasks：</h4><ul>
+<li>Medical Image Segmentation</li>
+</ul>
+<p>医学影像分割</p>
+<ul>
+<li>Lesion Segmentation</li>
+</ul>
+<p>病变分割</p>
+<ul>
+<li>Brain Tumor Segmentation</li>
+</ul>
+<p>脑肿瘤的分割</p>
+<ul>
+<li>Brain Segmentation</li>
+</ul>
+<p>大脑分割</p>
+<ul>
+<li>Cell Segmentation</li>
+</ul>
+<p>细胞分割</p>
+<ul>
+<li>Retinal Vessel Segmentation</li>
+</ul>
+<p>视网膜血管的分割</p>
+<ul>
+<li>3D Medical Imaging Segmentation</li>
+</ul>
+<p>三维医学影像分割</p>
+<ul>
+<li>Cardiac Segmentation</li>
+</ul>
+<p>心脏分割</p>
+<ul>
+<li>Liver Segmentation</li>
+</ul>
+<p>肝脏分割</p>
+<ul>
+<li>Brain Image Segmentation</li>
+</ul>
+<p>大脑图像分割</p>
+<ul>
+<li>COVID-19 Image Segmentation</li>
+<li>Lung Nodule Segmentation</li>
+<li>Pancreas Segmentation</li>
+<li>Iris Segmentation</li>
+<li>Electron Microscopy Image Segmentation</li>
+<li>Nuclear Segmentation</li>
+<li>Skin Cancer Segmentation</li>
+<li>Volumetric Medical Image Segmentation</li>
+<li>Infant Brain Mri Segmentation</li>
+<li>Brain Lesion Segmentation From Mri</li>
+<li>Ischemic Stroke Lesion Segmentation</li>
+<li>Automatic Liver And Tumor Segmentation</li>
+<li>Acute Stroke Lesion Segmentation</li>
+<li>Cerebrovascular Network Segmentation</li>
+<li>Placenta Segmentation</li>
+<li>Pulmorary Vessel Segmentation</li>
+<li>Automated Pancreas Segmentation</li>
+<li>Brain Ventricle Localization And Segmentation In 3D Ultrasound Images</li>
+<li>Semantic Segmentation Of Orthoimagery</li>
+</ul>
+<h3 id="1-1-2-有关多模态数据的研究"><a href="#1-1-2-有关多模态数据的研究" class="headerlink" title="1.1.2 有关多模态数据的研究"></a>1.1.2 有关多模态数据的研究</h3><h3 id="1-1-3-有关3D医学影像的研究"><a href="#1-1-3-有关3D医学影像的研究" class="headerlink" title="1.1.3 有关3D医学影像的研究"></a>1.1.3 有关3D医学影像的研究</h3><h2 id="1-2-相关工作"><a href="#1-2-相关工作" class="headerlink" title="1.2 相关工作"></a>1.2 相关工作</h2><h3 id="1-2-1-latest-work"><a href="#1-2-1-latest-work" class="headerlink" title="1.2.1 latest work"></a>1.2.1 latest work</h3><ul>
+<li><h4 id="nnU-Net-for-Brain-Tumor-Segmentation"><a href="#nnU-Net-for-Brain-Tumor-Segmentation" class="headerlink" title="nnU-Net for Brain Tumor Segmentation"></a>nnU-Net for Brain Tumor Segmentation</h4></li>
+</ul>
+<img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924183405234.png" alt="image-20210924183405234" style="zoom: 33%;">
+
+<img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924194612515.png" alt="image-20210924194612515" style="zoom: 33%;">
+
+
+
+<ul>
+<li><p><strong>H2NF-Net for Brain Tumor Segmentation using Multimodal MR Imaging: 2nd Place Solution to BraTS Challenge 2020 Segmentation Task</strong></p>
+<h5 id="——MICCAI-BrainLesion-Workshop-2020"><a href="#——MICCAI-BrainLesion-Workshop-2020" class="headerlink" title="——MICCAI BrainLesion Workshop 2020"></a>——MICCAI BrainLesion Workshop 2020</h5></li>
+</ul>
+<img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924180000587.png" alt="image-20210924180000587" style="zoom: 33%;">
+
+<img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924184453627.png" alt="image-20210924184453627" style="zoom:33%;">
+
+
+
+
+
+<ul>
+<li><p><strong>Modality-Pairing Learning for Brain Tumor Segmentation</strong> </p>
+<h5 id="Second-place-of-BraTS-2020-Challenge"><a href="#Second-place-of-BraTS-2020-Challenge" class="headerlink" title="Second place of BraTS 2020 Challenge"></a>Second place of BraTS 2020 Challenge</h5></li>
+</ul>
+<img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924180234044.png" alt="image-20210924180234044" style="zoom: 25%;">
+
+<img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924185035312.png" alt="image-20210924185035312" style="zoom: 33%;">
+
+
+
+<p>每个灰色区域代表一个卷积块，块中的数字表示通道数。红色箭头对应于卷积，虚线箭头表示特征图之间的跳转<br>连接。蓝色和橙色方框用于区分不同分支的特征图。</p>
+<ul>
+<li><p><strong>HI-Net: Hyperdense Inception 3D UNet for Brain Tumor Segmentation</strong></p>
+</li>
+<li><h5 id="Hi-Net-Hybrid-fusion-Network-for-Multi-modal-MR-Image-Synthesis"><a href="#Hi-Net-Hybrid-fusion-Network-for-Multi-modal-MR-Image-Synthesis" class="headerlink" title="Hi-Net: Hybrid-fusion Network for Multi-modal MR Image Synthesis"></a>Hi-Net: Hybrid-fusion Network for Multi-modal MR Image Synthesis</h5></li>
+</ul>
+<p>For segmentation：</p>
+<img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924200132865.png" alt="image-20210924200132865" style="zoom: 25%;">
+
+<img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924201821466.png" alt="image-20210924201821466" style="zoom: 25%;">
+
+
+
+<p>For reconstruction：</p>
+<img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924195553903.png" alt="image-20210924195553903" style="zoom: 33%;">
+
+
+
+<ul>
+<li><h4 id="HyperDense-Net-A-hyper-densely-connected-CNN-for-multi-modal-image-segmentation"><a href="#HyperDense-Net-A-hyper-densely-connected-CNN-for-multi-modal-image-segmentation" class="headerlink" title="HyperDense-Net: A hyper-densely connected CNN for multi-modal image segmentation"></a>HyperDense-Net: A hyper-densely connected CNN for multi-modal image segmentation</h4><h4 id="——IEEE-Transactions-on-Medical-Imaging-2018-sci2区期刊"><a href="#——IEEE-Transactions-on-Medical-Imaging-2018-sci2区期刊" class="headerlink" title="——IEEE Transactions on Medical Imaging 2018 sci2区期刊"></a>——IEEE Transactions on Medical Imaging 2018 sci2区期刊</h4></li>
+</ul>
+<img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924160626034.png" alt="image-20210924160626034" style="zoom:33%;">
+
+
+
+<img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924160734532.png" alt="image-20210924160734532" style="zoom:25%;">
+
+<img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924161030740.png" alt="image-20210924161030740" style="zoom: 25%;">
+
+
+
+<p><a href="https://github.com/josedolz/HyperDenseNet">code</a></p>
+<ul>
+<li><h5 id="Deep-Multimodal-Fusion-by-Channel-Exchanging"><a href="#Deep-Multimodal-Fusion-by-Channel-Exchanging" class="headerlink" title="Deep Multimodal Fusion by Channel Exchanging"></a>Deep Multimodal Fusion by Channel Exchanging</h5><h5 id="——-NeurIPS-2020"><a href="#——-NeurIPS-2020" class="headerlink" title="—— NeurIPS 2020"></a>—— NeurIPS 2020</h5></li>
+</ul>
+<img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924164916753.png" alt="image-20210924164916753" style="zoom: 33%;">
+
+<img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924205731448.png" alt="image-20210924205731448" style="zoom: 33%;">
+
+<p>通道交换网络(Channel-Exchanging-Network, CEN)，在不同模态子网络中动态的交换通道</p>
+<img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210925101209766.png" alt="image-20210925101209766" style="zoom:25%;">
+
+
+
+<h4 id="current-method：aggregation-and-alignment-fusion-聚合融合-对齐融合"><a href="#current-method：aggregation-and-alignment-fusion-聚合融合-对齐融合" class="headerlink" title="current method：aggregation and alignment fusion   聚合融合 对齐融合"></a>current method：aggregation and alignment fusion   聚合融合 对齐融合</h4><ul>
+<li><h5 id="A-review-Deep-learning-for-medical-image-segmentation-using-multi-modality-fusion-Array-2019）"><a href="#A-review-Deep-learning-for-medical-image-segmentation-using-multi-modality-fusion-Array-2019）" class="headerlink" title="A review: Deep learning for medical image segmentation using multi-modality fusion (Array 2019）"></a>A review: Deep learning for medical image segmentation using multi-modality fusion (Array 2019）</h5><p>Multi-modal segmentation networks</p>
+<ol>
+<li><p>Input-level fusion network</p>
+<p><img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924155209154.png" alt="image-20210924155209154"></p>
+<p>在输入级融合策略中，将多模态图像逐通道融合作为多通道输入， </p>
+<p>学习融合特征表示，然后对分割网络进行训练。现有的多模态医学图像 </p>
+<p>分割网络大多采用输入级融合策略，直接集成了多模态</p>
+<ol start="2">
+<li>Layer-level fusion</li>
+</ol>
+</li>
+</ol>
+<p><img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924155344800.png" alt="image-20210924155344800"></p>
+<ol start="3">
+<li> Decision-level fusion</li>
+</ol>
+<p><img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/image-20210924155455726.png" alt="image-20210924155455726"></p>
+</li>
+</ul>
+<p>domain adaptive、federated learning、transformer</p>
+<p>domian shift</p>
+<h2 id="1-3-相关数据集"><a href="#1-3-相关数据集" class="headerlink" title="1.3 相关数据集"></a>1.3 相关数据集</h2><p>BraTs 数据集：</p>
+<h3 id="t1、t2、t1ce、flair四种模态"><a href="#t1、t2、t1ce、flair四种模态" class="headerlink" title="t1、t2、t1ce、flair四种模态"></a>t1、t2、t1ce、flair四种模态</h3><p>MRI<br>MRI是核共振成像(MR Image),原理是施加一个磁场,让原子核和磁场的节拍动起来(共振),当磁场停下来的时候,原子核恢复常态,这个恢复的过程会以电磁波的形式释放能量,探头检测出这个能量,并用于成像</p>
+<p>Flair<br>FLAIR序列是核磁共振(MR)的一种常用的序列，全称是液体衰减反转回复序列，也称为水抑制成像技术. 通俗地说,它是压水像。在该序列上，脑脊液呈现低信号(暗一些)，实质性病灶和含有结合水的病灶显示为明显的高信号(亮一些)</p>
+<p>T1、T2<br>T1、T2是用于测量电磁波的物理量,它们可以作为成像的数据.根据T1来成像的,就叫“T1加权成像(T1-weighted-imaging)”,临床工作中也经常简称“T1”,T2同理</p>
+<p>T1看解剖结构</p>
+<p>T1图像的整体感官跟“临床图像”的“习惯配色风格”非常接近,你看白质是白的,灰质是灰的,脑脊液是黑的.所以T1图像就可以看出各种断层解剖图.“T1看解剖结构”</p>
+<p>T2看病变</p>
+<p>T2信号跟水含量有关(而Flair是结合水)很多病灶的T2信号要强于周围的正常组织.而很多病变都伴随组织水肿.从下图中可以看到,非常白的是水肿,然后比较白的那块影影约约的就是病变(红色)的地方了.</p>
+<p>水肿应该是占位效应,就是肿瘤压迫到周围组织了,导致周围的组织细胞水肿.</p>
+<p>t1ce<br>t1ce序列要在做MR之前往血液打造影剂(颜料),亮的地方血供丰富,强化明显说明血流很丰富,什么地方需要血流很快呢?瘤嘛~它们不断分裂需要大量的营养. 下图所示, 蓝色区域是增强瘤(enhancing tumor),它环绕的里面绿色那些是坏疽(ju)(necrotic components),坏疽就是细胞坏死然后液化.所以这些坏疽还被被称为非增强瘤(non-enhancing tumor).</p>
+<h3 id="分割部分WT、ET、TC"><a href="#分割部分WT、ET、TC" class="headerlink" title="分割部分WT、ET、TC"></a>分割部分WT、ET、TC</h3><img src="/2021/09/13/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F%E5%88%86%E5%89%B2/20200306172511738.png" alt="20200306172511738" style="zoom:33%;">
+
+<p>Brats的数据集的一个序列的病例[颜色标签和上面那些图无关],我通过ITK-SNAP导入flair序列以及对应的分割标签, 需要分割有三个部分,分别是WT、ET、TC</p>
+<p>绿色为浮肿区域(ED,peritumoral edema) (标签2)、黄色为增强肿瘤区域(ET,enhancing tumor)(标签4)、红色为坏疽(NET,non-enhancing tumor)(标签1)、背景(标签0)</p>
+<p>3个嵌套的子区域: whole tumor (WT), tumor core (TC) and enhancing tumor (ET)</p>
+<ol>
+<li>WT = ED + ET + NET</li>
+<li>TC = ET+NET</li>
+<li>ET</li>
+</ol>
+<p>brats 训练集( training set) 又划分为HGG和LGG,它们分别表示:</p>
+<ul>
+<li><strong>HGG :高级别胶质瘤（WHO3～4级）</strong>为低分化胶质瘤；这类肿瘤为恶性肿瘤，患者预后较差。</li>
+<li><strong>LGG :低级别胶质瘤（WHO1～2级）</strong>为分化良好的胶质瘤；虽然这类肿瘤在生物上并不属于良性肿瘤，但是患者的预后相对较好。</li>
+</ul>
+<p>高级别胶质瘤(HGG)和低级别胶质瘤(LGG)一起训练时,会限制分割模型的学习能力.方法来缓解HGG和LGG之间的domain shift.</p>
+<h1 id="2"><a href="#2" class="headerlink" title="2."></a>2.</h1><p>ICLR</p>
+<p>idea：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 不确定性度量模块 可信 的  医学多模态数据 -&gt; other多模态数据 分割模型</li>
+<li><input disabled="" type="checkbox"> 联邦学习 的  医学 分割模型</li>
+<li><input disabled="" type="checkbox"> 参数交换的 多模态医学分割模型 （缺失模态）</li>
+</ul>
+<p><a href="https://www.zhihu.com/question/427767524/answer/1559571080">参考链接1</a></p>
+<p><a href="https://paperswithcode.com/area/medical/medical-image-segmentation">paper with code</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/137966918">kaggle图像分割经验</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/144690413">https://zhuanlan.zhihu.com/p/144690413</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/398261915">https://zhuanlan.zhihu.com/p/398261915</a></p>
+<p><a href="https://tech.ifeng.com/c/7r8fUvawDJ9">联邦学习医学影像</a></p>
+</body></html>]]></content>
+      <tags>
+        <tag>multimodal</tag>
+        <tag>medical image</tag>
+        <tag>segmentation</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据挖掘</title>
+    <url>/2021/09/18/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/</url>
+    <content><![CDATA[<html><head></head><body><p>[TOC]</p>
+<h1 id="1-数据"><a href="#1-数据" class="headerlink" title="1. 数据"></a>1. 数据</h1><h2 id="1-1-数据类型与属性类型"><a href="#1-1-数据类型与属性类型" class="headerlink" title="1.1 数据类型与属性类型"></a>1.1 数据类型与属性类型</h2><h2 id="1-2-知识"><a href="#1-2-知识" class="headerlink" title="1.2 知识"></a>1.2 知识</h2><p>知识发现的过程：</p>
+<ul>
+<li>数据清理</li>
+<li>数据集成</li>
+<li>数据选择</li>
+<li>数据变换</li>
+<li>数据挖掘</li>
+<li>模式评估</li>
+<li>知识表示</li>
+</ul>
+<h1 id="2-数据的度量"><a href="#2-数据的度量" class="headerlink" title="2.数据的度量"></a>2.数据的度量</h1><h2 id="2-1-数据类型与属性类型"><a href="#2-1-数据类型与属性类型" class="headerlink" title="2.1 数据类型与属性类型"></a>2.1 数据类型与属性类型</h2><p>数据类型</p>
+<p>属性类型：连续、离散</p>
+<h2 id="2-2-数据的统计描述"><a href="#2-2-数据的统计描述" class="headerlink" title="2.2 数据的统计描述"></a>2.2 数据的统计描述</h2><p>方差、均值、、</p>
+<h2 id="2-3-可视化"><a href="#2-3-可视化" class="headerlink" title="2.3 可视化"></a>2.3 可视化</h2><ul>
+<li>盒图、散点图</li>
+<li>层次可视化技术</li>
+<li>标签云</li>
+<li>可视化软件 citeSpace、Gephi</li>
+<li>t-SNE</li>
+<li>深度学习模型可视化工具 cnn explainer</li>
+</ul>
+<p>盒图：四分位数 Q1、Q2、Q3 IQR=Q3-Q1  、离群点</p>
+<p>散点图: 正相关、负相关、不相关</p>
+<p>平行坐标</p>
+<p>UCI Datasets：</p>
+<ul>
+<li><input disabled="" type="checkbox"> Iris Data Set</li>
+</ul>
+<img src="/2021/09/18/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/image-20210918090004603.png" alt="image-20210918090004603" style="zoom:33%;">
+
+
+
+<p>标签云：</p>
+<h2 id="2-4-度量数据的相似性和相异性"><a href="#2-4-度量数据的相似性和相异性" class="headerlink" title="2.4 度量数据的相似性和相异性"></a>2.4 度量数据的相似性和相异性</h2><p>相似性：</p>
+<p>相异性：</p>
+<h3 id="2-4-1-数据矩阵与相异性矩阵"><a href="#2-4-1-数据矩阵与相异性矩阵" class="headerlink" title="2.4.1 数据矩阵与相异性矩阵"></a>2.4.1 数据矩阵与相异性矩阵</h3><h3 id="2-4-2-标称属性的近邻性度量"><a href="#2-4-2-标称属性的近邻性度量" class="headerlink" title="2.4.2 标称属性的近邻性度量"></a>2.4.2 标称属性的近邻性度量</h3><h3 id="2-4-3-二元属性的近邻性度量"><a href="#2-4-3-二元属性的近邻性度量" class="headerlink" title="2.4.3 二元属性的近邻性度量"></a>2.4.3 二元属性的近邻性度量</h3><h3 id="2-4-4-序数属性的距离"><a href="#2-4-4-序数属性的距离" class="headerlink" title="2.4.4 序数属性的距离"></a>2.4.4 序数属性的距离</h3><h3 id="2-4-5-数值属性的距离"><a href="#2-4-5-数值属性的距离" class="headerlink" title="2.4.5 数值属性的距离"></a>2.4.5 数值属性的距离</h3><h3 id="2-4-8-数值属性的距离"><a href="#2-4-8-数值属性的距离" class="headerlink" title="2.4.8 数值属性的距离"></a>2.4.8 数值属性的距离</h3><h3 id="3-5-2-属性子集选择"><a href="#3-5-2-属性子集选择" class="headerlink" title="3.5.2 属性子集选择"></a>3.5.2 属性子集选择</h3><p><a href="https://www.baidu.com/link?url=Iuf1Tak0GCwO3DbvOTQLtzMCQoP2ZiexZlwudUiKo6TxqQ6WX7jxMt85aiwDqtu5esznqwcXZZVsQYlyy6GWCavImAslP9kiH7VY149MOwErbu7cI4OviwGMOIcJK10C&amp;wd=&amp;eqid=e33da29b000cc633000000026146b39a">https://www.baidu.com/link?url=Iuf1Tak0GCwO3DbvOTQLtzMCQoP2ZiexZlwudUiKo6TxqQ6WX7jxMt85aiwDqtu5esznqwcXZZVsQYlyy6GWCavImAslP9kiH7VY149MOwErbu7cI4OviwGMOIcJK10C&amp;wd=&amp;eqid=e33da29b000cc633000000026146b39a</a></p>
+<p><a href="https://wenku.baidu.com/view/1f84254950e79b89680203d8ce2f0066f4336493.html">https://wenku.baidu.com/view/1f84254950e79b89680203d8ce2f0066f4336493.html</a></p>
+<p><a href="https://wenku.baidu.com/view/122c6d9eeffdc8d376eeaeaad1f34693daef10e5.html">https://wenku.baidu.com/view/122c6d9eeffdc8d376eeaeaad1f34693daef10e5.html</a></p>
+<p><a href="https://wenku.baidu.com/view/8ceac99bb6daa58da0116c175f0e7cd18525182c.html">https://wenku.baidu.com/view/8ceac99bb6daa58da0116c175f0e7cd18525182c.html</a></p>
+<p><a href="https://wenku.baidu.com/view/bc8aa85682d049649b6648d7c1c708a1294a0a3f.html">https://wenku.baidu.com/view/bc8aa85682d049649b6648d7c1c708a1294a0a3f.html</a></p>
+<p><a href="https://www.docin.com/p-1895549131.html">https://www.docin.com/p-1895549131.html</a></p>
 </body></html>]]></content>
   </entry>
   <entry>
@@ -875,9 +1162,9 @@
 <ol>
 <li><p>BN（Batch Normalization）在训练阶段和测试阶段的操作有什么区别，为什么这么做？</p>
 <p>BN在训练阶段，保持计算每一个Batch的均值和方差，BN在训练阶段，计算每个batch的均值和方差，然后通过一个滑动平均值方法保存，在pytorch中，通过一个参数momentum保存每个连续计算的batch的均值和方差的。</p>
-<p>均值是每个batch的均值的均值，方差是每个batch的无偏估计量。但是在pytorch具体实现是采用以上所说的滑动平均值方法计算的，所以最后一旦整个训练阶段完成，</p>
+<p>均值是每个batch的均值的均值，方差是每个batch的无偏估计量。但是在pytorch具体实现是采用以上所说的滑动平均值方法计算的，所以最后一旦整个训练阶段完成</p>
 <p>BN层中的所有参数也就固定下来，然后直接用于test</p>
-<p>因为训练过程中，训练数据是不断流入的，数据分布是变化的，根据已经输入的数据即已经输入的batch数据来通过均值，与无偏估计的方差来 估计真实的全部数据分布，有助于实现较好的归一化效果，而测试过程中，因为模型经过训练，BN参数已经在训练集合上优化完毕，若再在测试集上更改参数，可能会导致过拟合现象</p>
+<p>因为训练过程中，训练数据是不断流入的，数据分布是变化的，根据已经输入的数据即已经输入的batch数据来通过均值，与无偏估计的方差来 估计真实的全部数据分布，有助于实现较好的归一化效果，而测试过程中，因为模型经过训练，BN参数已经在训练集合上优化完毕，若再在测试集上改参数，可能会导致过拟合现象</p>
 </li>
 <li><p>若未做归一化会出现什么问题？</p>
 <p>神经网络学习过程的<strong>本质就是为了学习数据分布</strong>，如果我们没有做归一化处理，那么每一批次训练数据的分布不一样，从大的方向上看，神经网络则需要在这多个分布中找到平衡点，从小的方向上看，由于每层网络输入数据分布在不断变化，这也会导致每层网络在找平衡点，显然，<strong>神经网络就很难收敛了</strong>。</p>
@@ -892,5 +1179,72 @@
         <tag>深度学习</tag>
         <tag>deep learning</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>网页前端 框架</title>
+    <url>/2021/09/06/%E7%BD%91%E9%A1%B5%E5%89%8D%E7%AB%AF-%E6%A1%86%E6%9E%B6/</url>
+    <content><![CDATA[<html><head></head><body><h1 id="框架解析："><a href="#框架解析：" class="headerlink" title="框架解析："></a>框架解析：</h1><h2 id="VUE是什么？"><a href="#VUE是什么？" class="headerlink" title="VUE是什么？"></a>VUE是什么？</h2><p>是一个用于创建用户界面的开源JavaScript框架，也是一个创建单页应用的Web应用框架。 2016年一项针对JavaScript的调查表明，Vue有着89%的开发者满意度。</p>
+<p>在GitHub上，该项目平均每天能收获95颗星，[为Github有史以来星标数第3多的项目</p>
+<h2 id="ECharts是什么？"><a href="#ECharts是什么？" class="headerlink" title="ECharts是什么？"></a>ECharts是什么？</h2><p>它是一个数据可视化框架，可以流畅的运行在 PC 和移动设备上，兼容当前绝大部分浏览器，供了 图例、视觉映射、数据区域缩放、tooltip、数据刷选等开箱即用的交互组件，可以对数据进行多维度数据筛取、视图缩放、展示细节等交互操作，让你的数据形象生动起来，不再是简简单单的一个表格。</p>
+<h2 id="AntV是什么？"><a href="#AntV是什么？" class="headerlink" title="AntV是什么？"></a>AntV是什么？</h2><p>蚂蚁金服全新一代数据可视化前端框架，短短几行代码就能够做出精美的数据图表，甚至兼容pc端和移动端。</p>
+<h2 id="Element是什么？"><a href="#Element是什么？" class="headerlink" title="Element是什么？"></a>Element是什么？</h2><p>前端工程师喜爱的css框架，能够提供精美的组件，开箱即用，并且具有良好的兼容性，熟练使用css框架，能够减少大部分开发时间（写界面的时间），从而专注于业务代码的实现。</p>
+<h2 id="Taro是什么？"><a href="#Taro是什么？" class="headerlink" title="Taro是什么？"></a>Taro是什么？</h2><p>在开发中，我们经常烦恼网页一种代码，小程序一种代码，那么到底有没有办法让我们只开发一种，然后可以用在所有的地方呢？</p>
+<p>还真有，这个框架让你的代码在多种环境下都能够跑起来，<strong>Taro，多端统一开发解决方案</strong>，意味着你用这个框架开发出来的项目，能够运行在各个平台上。</p>
+<h2 id="Taro-UI是什么？"><a href="#Taro-UI是什么？" class="headerlink" title="Taro UI是什么？"></a>Taro UI是什么？</h2><p>这是一款基于taro框架开发的多端UI组件库，强大的交互组件，让你的开发更加高效。</p>
+<h2 id="uni-app是什么？"><a href="#uni-app是什么？" class="headerlink" title="uni-app是什么？"></a>uni-app是什么？</h2><p>和Taro一样，也是一个多端统一开发解决方案，但是这个框架熟悉的人比较多，使用的人也比较多，博主也是在使用中一个框架，上手比较快，值得推荐。</p>
+<h2 id="stylus"><a href="#stylus" class="headerlink" title="stylus"></a>stylus</h2><p>强大的css预处理器，让css书写更加随意，可以有函数，变量计算，动态引入，条件表达等等，用了直呼爽，后悔不早用。</p>
+<h2 id="jquery"><a href="#jquery" class="headerlink" title="jquery"></a>jquery</h2><p>jquery不能说为技术，jQuery，顾名思议，也就是JavaScript和查询（Query），即是辅助JavaScript开发的库。</p>
+</body></html>]]></content>
+  </entry>
+  <entry>
+    <title>meaningful</title>
+    <url>/2021/09/19/meaningful/</url>
+    <content><![CDATA[<html><head></head><body><h1 id="1-数据"><a href="#1-数据" class="headerlink" title="1. 数据"></a>1. 数据</h1><p>1.1 数据采集</p>
+<p>传感器、人工收集等方式收集结构化或非结构化数据</p>
+<p>不同参数下采集的数据的差异性 </p>
+<p>联邦学习：不同数据来源，加密有效的训练  BraTs、Cityscapes</p>
+<p>1.2 数据存储</p>
+<p>1.3 数据增强</p>
+<p>数据增强gan</p>
+<h1 id="2-特征"><a href="#2-特征" class="headerlink" title="2. 特征"></a>2. 特征</h1><p>2.1 数据特征</p>
+<p>2.2 特征提取</p>
+<h1 id="3-信息"><a href="#3-信息" class="headerlink" title="3. 信息"></a>3. 信息</h1><h1 id="4-表示"><a href="#4-表示" class="headerlink" title="4. 表示"></a>4. 表示</h1><h1 id="5-推理"><a href="#5-推理" class="headerlink" title="5. 推理"></a>5. 推理</h1></body></html>]]></content>
+  </entry>
+  <entry>
+    <title>数学模型</title>
+    <url>/2021/09/26/%E6%95%B0%E5%AD%A6%E6%A8%A1%E5%9E%8B/</url>
+    <content><![CDATA[<html><head></head><body></body></html>]]></content>
+  </entry>
+  <entry>
+    <title>Reinforcement learning</title>
+    <url>/2021/09/25/Reinforcement-learning/</url>
+    <content><![CDATA[<html><head></head><body><p>强化学习的关键要素有：environment，reward，action 和 state</p>
+<h1 id="value-function"><a href="#value-function" class="headerlink" title="value function"></a>value function</h1><p>最大化reward来得到一个最优策略</p>
+<p>如果只是瞬时reward最大会导致每次都只会从动作空间选择reward最大的那个动作，这样就变成了最简单的贪心策略(Greedy policy)，所以为了很好地刻画是包括未来的当前reward值最大（即使从当前时刻开始一直到状态达到目标的总reward最大）。因此就够早了值函数（value function）来描述这一变量。</p>
+<h1 id="bellman方程"><a href="#bellman方程" class="headerlink" title="bellman方程"></a>bellman方程</h1></body></html>]]></content>
+  </entry>
+  <entry>
+    <title>聊天机器人</title>
+    <url>/2021/09/18/%E8%81%8A%E5%A4%A9%E6%9C%BA%E5%99%A8%E4%BA%BA/</url>
+    <content><![CDATA[<html><head></head><body><p><a href="https://www.jiqizhixin.com/articles/2019-07-11-7">https://www.jiqizhixin.com/articles/2019-07-11-7</a></p>
+<p><img src="/2021/09/18/%E8%81%8A%E5%A4%A9%E6%9C%BA%E5%99%A8%E4%BA%BA/640.png" alt="img"></p>
+<p><img src="/2021/09/18/%E8%81%8A%E5%A4%A9%E6%9C%BA%E5%99%A8%E4%BA%BA/640-20210918100917483.png" alt="img"></p>
+<p>电视剧情感 画面、语言、文字 特征</p>
+<p>MMEW包含300个微表达式和900个宏表达式，其中包括六种基本类型，幸福，惊奇，愤怒，厌恶，恐惧和悲伤</p>
+<ul>
+<li><input disabled="" type="checkbox"> 人脸情感</li>
+<li><input disabled="" type="checkbox"> 文本情感 -?&gt;语音情感</li>
+<li><input disabled="" type="checkbox"> 对话系统</li>
+<li><input disabled="" type="checkbox"> 情感特征与语义特征 融合</li>
+<li><input disabled="" type="checkbox"> 数据集</li>
+</ul>
+<ul>
+<li>调研大体背景：这周</li>
+<li>下周，复现：人脸人脸情感      文本情感、对话系统</li>
+<li>下下周，十分详细的·讨论 数据集格式规模、究竟要做成效果、对话系统的任务类型、情感特征与语义特征 融合</li>
+<li>demo做出来</li>
+<li>一个月时间做融合，出稿1.0</li>
+</ul>
+</body></html>]]></content>
   </entry>
 </search>
