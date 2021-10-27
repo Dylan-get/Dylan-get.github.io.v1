@@ -588,7 +588,7 @@
 <li><p>git add </p>
 </li>
 <li><p>git commit </p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git commit -m "first commit"</span><br></pre></td></tr></tbody></table></figure></li>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git commit -m "init"</span><br></pre></td></tr></tbody></table></figure></li>
 <li><p>git branch</p>
 <figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git branch -M main</span><br></pre></td></tr></tbody></table></figure>
 
@@ -599,18 +599,18 @@
 </ul>
 </li>
 <li><p>git remote add </p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git remote add origin git@gitee.com:wuhaitao_coding/ttest.git</span><br></pre></td></tr></tbody></table></figure></li>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git remote add origin git@github.com:ImportPaddle/apcnet.git</span><br></pre></td></tr></tbody></table></figure></li>
 <li><p>git push</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git push origin master</span><br><span class="line">git push -u origin master #加了参数-u后，以后即可直接用git push 代替git push origin master</span><br></pre></td></tr></tbody></table></figure></li>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git push origin main</span><br><span class="line">git push -u origin main #加了参数-u后，以后即可直接用git push 代替git push origin master</span><br></pre></td></tr></tbody></table></figure></li>
 <li><p>git alias</p>
 </li>
 <li></li>
 </ol>
 <p>大家一定要养成在项目开始就创建.gitignore文件的习惯，否则一旦push，处理起来会非常麻烦</p>
 <p>有时候在项目开发过程中，突然心血来潮想把某些目录或文件加入忽略规则，按照上述方法定义后发现并未生效，原因是.gitignore只能忽略那些原来没有被track的文件，如果某些文件已经被纳入了版本管理中，则修改.gitignore是无效的。那么解决方法就是先把本地缓存删除（改变成未track状态），然后再提交：</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git rm -r --cached .</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line">git commit -m 'update .gitignore'</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">git rm -r --cached .</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line">git commit -m 'update '</span><br></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#git fatal: 远程 origin 已经存在 </span><br><span class="line">#重新添加远程</span><br><span class="line">git remote -v  </span><br><span class="line">git remote rm origin</span><br><span class="line"></span><br><span class="line">git remote add origin git@gitee.com:wuhaitao_coding/knowledge-graph.git</span><br><span class="line">username填写gitee户名，我这里是：fortunamajor</span><br><span class="line">um.git 填写仓库名.git</span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#git fatal: 远程 origin 已经存在 </span><br><span class="line">#重新添加远程</span><br><span class="line">git remote -v  </span><br><span class="line">git remote rm origin</span><br><span class="line"></span><br><span class="line">git remote add origin git@github.com:ImportPaddle/FeatureLearningRotNet.git</span><br><span class="line">username填写gitee户名，我这里是：fortunamajor</span><br><span class="line">um.git 填写仓库名.git</span><br></pre></td></tr></tbody></table></figure>
 
 
 
@@ -810,7 +810,7 @@
 <li>-q 不显示指令执行过程</li>
 <li>-r 递归处理，将指定目录下的所有文件和子目录一并处理</li>
 </ul>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">unzip test.zip <span class="comment">#解压到当前文件下</span></span><br><span class="line">unzip -n test.zip -d /tmp <span class="comment">#解压到/tmp目录下，并且不要覆盖已有文件</span></span><br><span class="line">unzip -v test.zip <span class="comment">#查看test.zip内容，但不解压</span></span><br><span class="line">unzip -o test.zip -d tmp/ <span class="comment">#解压到/tmp目录下，并且覆盖已有文件</span></span><br></pre></td></tr></tbody></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">unzip test.zip <span class="comment">#解压到当前文件下</span></span><br><span class="line">unzip -n test.zip -d /tmp <span class="comment">#解压到/tmp目录下，并且不要覆盖已有文件</span></span><br><span class="line">unzip -v test.zip <span class="comment">#查看test.zip内容，但不解压</span></span><br><span class="line">unzip -o test.zip -d tmp/ <span class="comment">#解压到/tmp目录下，并且覆盖已有文件</span></span><br><span class="line">-n	解压缩时不要覆盖原有的文件</span><br><span class="line">-q	执行时不显示任何信息；</span><br></pre></td></tr></tbody></table></figure>
 
 <ul>
 <li>-v 查看压缩文件目录信息，但是不解压该文件</li>
@@ -1064,11 +1064,19 @@
 
 <p>Brats的数据集的一个序列的病例[颜色标签和上面那些图无关],我通过ITK-SNAP导入flair序列以及对应的分割标签, 需要分割有三个部分,分别是WT、ET、TC</p>
 <p>绿色为浮肿区域(ED,peritumoral edema) (标签2)、黄色为增强肿瘤区域(ET,enhancing tumor)(标签4)、红色为坏疽(NET,non-enhancing tumor)(标签1)、背景(标签0)</p>
-<p>3个嵌套的子区域: whole tumor (WT), tumor core (TC) and enhancing tumor (ET)</p>
+<ul>
+<li>背景(标签0)</li>
+<li>坏疽(NET,non-enhancing tumor)(标签1) 红色</li>
+<li>浮肿区域(ED,peritumoral edema) (标签2) 绿色</li>
+<li>增强肿瘤区域(ET,enhancing tumor)(标签4) 黄色</li>
+</ul>
+<p>3个嵌套的子区域: whole tumor (WT) , enhancing tumor (ET) (标签4)黄色  tumor core (TC) </p>
+<p>并集：union[‘ju:njən] of set<br>交集：intersection[.intə(:)’sekʃən] of sets</p>
+<p>The whole tumor (WT) class includes all visible labels (a union of green, yellow and red labels), the tumor core (TC) class is a union of red and yellow, and the enhancing tumor core (ET) class is shown in yellow (a hyperactive tumor part).</p>
 <ol>
-<li>WT = ED + ET + NET</li>
-<li>TC = ET+NET</li>
-<li>ET</li>
+<li>WT = ED + ET + NET  绿色+黄色+红色</li>
+<li>TC = ET+NET  黄色+红色 </li>
+<li>ET enhancing tumor (ET) (标签4) 黄色</li>
 </ol>
 <p>brats 训练集( training set) 又划分为HGG和LGG,它们分别表示:</p>
 <ul>
@@ -1083,12 +1091,19 @@
 <li><input disabled="" type="checkbox"> 联邦学习 的  医学 分割模型</li>
 <li><input disabled="" type="checkbox"> 参数交换的 多模态医学分割模型 （缺失模态）</li>
 </ul>
+<p><a href="http://www.bubuko.com/infodetail-3717645.html">http://www.bubuko.com/infodetail-3717645.html</a></p>
+<p><strong>多标签分类</strong>输出不做概率化处理（<code>softmax</code>）。原因是后面会用<code>nn.CrossEntropyLoss()</code>计算loss，该函数会自动将<strong>net()的输出</strong>做<code>softmax</code>以及<code>log</code>和<code>nllloss()</code>运算。                                                             </p>
+<p>当<strong>二分类</strong>的时候，如果计算损失用的是<code>nn.BCELoss()</code>，由于<strong>该函数并未做概率化处理</strong>，所以需要单独运算sigmoid，通常会在<strong>Unet模型的末尾输出</strong>。                              </p>
 <p><a href="https://www.zhihu.com/question/427767524/answer/1559571080">参考链接1</a></p>
 <p><a href="https://paperswithcode.com/area/medical/medical-image-segmentation">paper with code</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/137966918">kaggle图像分割经验</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/144690413">https://zhuanlan.zhihu.com/p/144690413</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/398261915">https://zhuanlan.zhihu.com/p/398261915</a></p>
 <p><a href="https://tech.ifeng.com/c/7r8fUvawDJ9">联邦学习医学影像</a></p>
+<p><a href="https://dblp.uni-trier.de/db/journals/pami/index.html">tpami</a></p>
+<p><a href="https://github.com/black0017/MedicalZooPytorch">MedicalZooPytorch</a></p>
+<p>写入时需要注意一个问题，像这种三维数据都有一个spacing属性，可以理解为像素之间的间隔，不同医学仪器拍出来的数据的spacing属性通常是不同的，因此，在保存写入*mha.或者nii.数据时需要把原始数据的属性spacing也保存进去，如果保存写入时不设置spacing属性，默认为 [1,1,1],会导致与原先数据的维度不一致。保存mha.*格式数据代码如下。</p>
+<p><a href="https://blog.csdn.net/weixin_43638371/article/details/103757717">https://blog.csdn.net/weixin_43638371/article/details/103757717</a></p>
 </body></html>]]></content>
       <tags>
         <tag>multimodal</tag>
@@ -1245,6 +1260,156 @@
 <li>demo做出来</li>
 <li>一个月时间做融合，出稿1.0</li>
 </ul>
+</body></html>]]></content>
+  </entry>
+  <entry>
+    <title>CEN 复现</title>
+    <url>/2021/09/27/CEN-%E5%A4%8D%E7%8E%B0/</url>
+    <content><![CDATA[<html><head></head><body></body></html>]]></content>
+  </entry>
+  <entry>
+    <title>SimpleITK</title>
+    <url>/2021/10/19/SimpleITK/</url>
+    <content><![CDATA[<html><head></head><body><p>SimpleITK是专门处理医学影像的软件，在SimpleITK中，图像的概念与我们在计算机视觉中常用的RGB图像差异很大，后者只是一个多维矩阵，是一个数学上的概念，而在SimpleITK中，图像是一种物理实体，图像中的每一个像素都是物理空间中的一个点，不光有着像素值，还有着坐标，间距，方向等概念</p>
+<p>size：图像在各维度的像素个数</p>
+<p>spacing：图像各维度上像素之间的距离（物理层面的，有单位，一般为mm)</p>
+<p>physical extent：图像在物理空间中的大小</p>
+<p>Origin：图像原点的坐标（物理层面的，有单位，一般为mm，与spacing保持一致）</p>
+<p>direction：采用方向余弦矩阵，也就是图像自身坐标系相对于世界坐标系（固定不动的）的角度，再直白点就是新坐标系在原坐标系上各个方向的投影</p>
+<p><img src="/2021/10/19/SimpleITK/1064248-20200320100706573-421249719.png" alt="img"></p>
+<p>原始<code>SimpleITK</code>数据的存储形式为(Width, Height, Depth)即（X，Y，Z），使用<code>GetArrayFromImage()</code>方法后，X轴与Z轴发生了对调，输出形状为：<code>(Depth, Height, Width)即（Z,Y,X）。</code></p>
+<ol>
+<li><p>完整性检查</p>
+</li>
+<li><p>Crop去除黑边</p>
+<p><strong>对数据去黑边，并将data、seg保存为npz文件，属性保存为pkl文件</strong></p>
+<ol>
+<li>读取多模态数据，以及其Mask，使用np.vstack对数据进行拼接</li>
+<li>获取多模态数据的非零区域，生成nonzero_mask</li>
+<li>根据nonzero_mask对数据以及seg进行crop，去黑边</li>
+<li>使用np将数据、seg一起保存进入npz、属性保存为pkl文件，加快后期数据加载速度</li>
+</ol>
+</li>
+<li><p>d</p>
+</li>
+</ol>
+</body></html>]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/10/18/paddle-paddle-DANet/</url>
+    <content><![CDATA[<html><head></head><body><h1 id="paddle-paddle-DANet复现总结："><a href="#paddle-paddle-DANet复现总结：" class="headerlink" title="paddle paddle DANet复现总结："></a>paddle paddle DANet复现总结：</h1><h2 id="整体"><a href="#整体" class="headerlink" title="整体"></a>整体</h2><h3 id="1-数据部分"><a href="#1-数据部分" class="headerlink" title="1.数据部分"></a>1.数据部分</h3><p>使用Cityscapes-gtFine数据集，类别19类，包含背景20类</p>
+<h3 id="2-模型部分"><a href="#2-模型部分" class="headerlink" title="2.模型部分"></a>2.模型部分</h3><p>使用Resnet 101作为backbone提取特征，以及CAM、PAM两个attention模块</p>
+<h3 id="3-Loss部分"><a href="#3-Loss部分" class="headerlink" title="3.Loss部分"></a>3.Loss部分</h3><p>softmax_with_cross_entropy<br>CAM、PAM、CAM+PAM<br>Weight[0.3,0.3,0.4]</p>
+<h3 id="4-Optimizer部分"><a href="#4-Optimizer部分" class="headerlink" title="4.Optimizer部分"></a>4.Optimizer部分</h3><p>MomentumOptimizer<br>momentum=0.9，l2_decay=0.0001<br>learning rate<br>warmup(2 epoch):由1e-4线性—&gt;1e-1<br>polynomial_decay:1e-1-&gt;(1e-1-1e-4)((1-iter/total_iter)**0.9)+1e-4</p>
+<h1 id="对齐："><a href="#对齐：" class="headerlink" title="对齐："></a>对齐：</h1><h3 id="1-模型结构对齐："><a href="#1-模型结构对齐：" class="headerlink" title="1.模型结构对齐："></a>1.模型结构对齐：</h3><ol>
+<li>定义PyTorch模型，加载权重，固定seed，基于numpy生成随机数，转换为PyTorch可以处理的tensor，送入网络，获取输出，使用reprod_log保存结果。</li>
+<li>定义PaddlePaddle模型，加载权重，固定seed，基于numpy生成随机数，转换为PaddlePaddle可以处理的tensor，送入网络，获取输出，使用reprod_log保存结果。</li>
+<li>使用reprod_log排查diff，小于阈值，完成自测。</li>
+</ol>
+<h3 id="2-评估指标对齐："><a href="#2-评估指标对齐：" class="headerlink" title="2.评估指标对齐："></a>2.评估指标对齐：</h3><p>miou</p>
+<h3 id="3-损失函数对齐："><a href="#3-损失函数对齐：" class="headerlink" title="3.损失函数对齐："></a>3.损失函数对齐：</h3><h3 id="4-反向初次对齐："><a href="#4-反向初次对齐：" class="headerlink" title="4.反向初次对齐："></a>4.反向初次对齐：</h3><h3 id="5-训练对齐："><a href="#5-训练对齐：" class="headerlink" title="5.训练对齐："></a>5.训练对齐：</h3></body></html>]]></content>
+  </entry>
+  <entry>
+    <title>DANet</title>
+    <url>/2021/10/11/DANet/</url>
+    <content><![CDATA[<html><head></head><body><p>论文名称：<a href="https://paperswithcode.com/paper/dual-attention-network-for-scene-segmentation">Dual Attention Network for Scene Segmentation</a> <br>数据集：Cityscapes <br>验收标准：DANet101 mIOU=79.93</p>
+<p>19类</p>
+<ul>
+<li>Download the <a href="https://www.cityscapes-dataset.com/">Cityscapes</a> dataset and convert the dataset to <a href="https://github.com/mcordts/cityscapesScripts/blob/master/cityscapesscripts/helpers/labels.py">19 categories</a>.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="right">bic</th>
+<th>road</th>
+<th>sidewalk</th>
+<th>building</th>
+<th>wall</th>
+<th>fence</th>
+<th>pole</th>
+<th>traffic</th>
+<th>light</th>
+<th>traffic</th>
+<th>sign</th>
+<th>vegetation</th>
+<th>terrain</th>
+<th>sky</th>
+<th>person</th>
+<th>rider</th>
+<th>car</th>
+<th>truck</th>
+<th>bus</th>
+<th>motorcycle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="right"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="right"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
 </body></html>]]></content>
   </entry>
 </search>
